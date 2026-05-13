@@ -1,0 +1,141 @@
+from __future__ import annotations
+
+from typing import Any
+
+import httpx
+import pytest
+
+from prefect_xquik import XquikClient, XquikError
+
+
+@pytest.mark.asyncio
+async def test_search_tweets_sends_expected_headers_and_params() -> None:
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(200, json={"tweets": []})
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(
+        base_url="https://api.xquik.test", transport=transport
+    ) as http_client:
+        client = XquikClient(
+            "secret-key",
+            base_url="https://api.xquik.test",
+            http_client=http_client,
+        )
+        result = await client.search_tweets(
+            "prefect",
+            limit=25,
+            query_type="Top",
+            since_time="1710000000",
+        )
+
+    assert result == {"tweets": []}
+    assert len(requests) == 1
+    request = requests[0]
+    assert request.headers["x-api-key"] == "secret-key"
+    assert request.headers["xquik-api-contract"] == "2026-04-29"
+    assert request.url.path == "/x/tweets/search"
+    assert request.url.params["q"] == "prefect"
+    assert request.url.params["limit"] == "25"
+    assert request.url.params["queryType"] == "Top"
+    assert request.url.params["sinceTime"] == "1710000000"
+    assert "cursor" not in request.url.params
+
+
+@pytest.mark.asyncio
+async def test_get_tweet_url_encodes_path_parts() -> None:
+    request_url: str | None = None
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal request_url
+        request_url = str(request.url)
+        return httpx.Response(200, json={"tweet": {"id": "a/b"}})
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(
+        base_url="https://api.xquik.test", transport=transport
+    ) as http_client:
+        client = XquikClient("secret-key", http_client=http_client)
+        result = await client.get_tweet("a/b")
+
+    assert result == {"tweet": {"id": "a/b"}}
+    assert request_url == "https://api.xquik.test/x/tweets/a%2Fb"
+
+
+@pytest.mark.asyncio
+async def test_get_user_tweets_strips_at_prefix_and_serializes_booleans() -> None:
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(200, json={"tweets": []})
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(
+        base_url="https://api.xquik.test", transport=transport
+    ) as http_client:
+        client = XquikClient("secret-key", http_client=http_client)
+        result = await client.get_user_tweets(
+            "@prefect",
+            include_parent_tweet=True,
+            include_replies=True,
+        )
+
+    assert result == {"tweets": []}
+    assert len(requests) == 1
+    request = requests[0]
+    assert request.url.path == "/x/users/prefect/tweets"
+    assert request.url.params["includeParentTweet"] == "true"
+    assert request.url.params["includeReplies"] == "true"
+
+
+@pytest.mark.asyncio
+async def test_get_trends_validates_count() -> None:
+    client = XquikClient("secret-key")
+
+    with pytest.raises(ValueError, match="count must be between 1 and 50"):
+        await client.get_trends(count=51)
+
+
+@pytest.mark.asyncio
+async def test_http_error_raises_xquik_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(429, text="rate limited", request=request)
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(
+        base_url="https://api.xquik.test", transport=transport
+    ) as http_client:
+        client = XquikClient("secret-key", http_client=http_client)
+
+        with pytest.raises(XquikError) as exc_info:
+            await client.search_users("prefect")
+
+    assert exc_info.value.status_code == 429
+    assert exc_info.value.response_text == "rate limited"
+
+
+@pytest.mark.parametrize(
+    ("method_name", "args", "error"),
+    [
+        ("search_tweets", ("",), "q must not be empty"),
+        ("search_tweets", ("prefect",), 'query_type must be "Latest" or "Top"'),
+        ("search_users", ("",), "q must not be empty"),
+        ("get_user", ("@",), "user_id must not be empty"),
+        ("get_tweet", ("",), "tweet_id must not be empty"),
+    ],
+)
+@pytest.mark.asyncio
+async def test_validation_errors(
+    method_name: str, args: tuple[str, ...], error: str
+) -> None:
+    client = XquikClient("secret-key")
+    kwargs: dict[str, Any] = {}
+    if method_name == "search_tweets" and args == ("prefect",):
+        kwargs["query_type"] = "Mixed"
+
+    with pytest.raises(ValueError, match=error):
+        await getattr(client, method_name)(*args, **kwargs)
