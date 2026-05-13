@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- Improve README discoverability with badges, clearer title, navigation links,
+  use cases, and documentation links.
+- Expand package metadata keywords and project URLs.
+
 ## 0.1.3
 
 - Point package metadata, block docs, and README links at the Prefect guide.

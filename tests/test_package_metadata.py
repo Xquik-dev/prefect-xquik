@@ -40,5 +40,23 @@ def test_prefect_guide_url_is_canonical() -> None:
 
     assert pyproject["project"]["urls"]["Documentation"] == PREFECT_GUIDE_URL
     assert pyproject["project"]["urls"]["Homepage"] == PREFECT_GUIDE_URL
+    assert (
+        pyproject["project"]["urls"]["Xquik API Reference"]
+        == "https://docs.xquik.com/api-reference/overview"
+    )
     assert PREFECT_GUIDE_URL in readme
     assert XquikCredentials._documentation_url == PREFECT_GUIDE_URL
+
+
+def test_package_keywords_cover_discovery_terms() -> None:
+    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
+
+    assert {
+        "data-pipelines",
+        "prefect-collection",
+        "prefect-integration",
+        "twitter-api",
+        "workflow-orchestration",
+        "x-twitter",
+        "xquik",
+    }.issubset(set(pyproject["project"]["keywords"]))
