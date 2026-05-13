@@ -1,4 +1,4 @@
-# prefect-xquik: Prefect tasks for Xquik X/Twitter data workflows
+# Prefect tasks for Xquik X/Twitter data workflows
 
 <p align="center">
     <a href="https://github.com/Xquik-dev/prefect-xquik/actions/workflows/ci.yml" alt="CI status">
