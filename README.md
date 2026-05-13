@@ -28,6 +28,11 @@
     <a href="https://docs.prefect.io/">Prefect Docs</a>
 </p>
 
+<p align="center">
+    <strong>Guide:</strong>
+    <a href="https://docs.xquik.com/guides/prefect">https://docs.xquik.com/guides/prefect</a>
+</p>
+
 Run scheduled X/Twitter data reads in Prefect 3 flows with a reusable
 `XquikCredentials` block, async tasks, retries, and normal Prefect deployment
 patterns.
