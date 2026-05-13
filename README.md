@@ -15,8 +15,10 @@ useful for scheduled research, social monitoring, and enrichment workflows:
 
 ## Install
 
+PyPI publication is pending. Use the pinned GitHub release artifact for now:
+
 ```bash
-pip install prefect-xquik
+pip install https://github.com/Xquik-dev/prefect-xquik/releases/download/v0.1.1/prefect_xquik-0.1.1-py3-none-any.whl
 ```
 
 For local development:
