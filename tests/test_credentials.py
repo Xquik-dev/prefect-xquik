@@ -24,3 +24,13 @@ def test_credentials_create_client() -> None:
 def test_credentials_reject_empty_api_key() -> None:
     with pytest.raises(ValidationError, match="api_key must not be empty"):
         XquikCredentials(api_key=" ")
+
+
+def test_credentials_reject_invalid_base_url() -> None:
+    with pytest.raises(ValidationError, match="base_url must be an HTTP or HTTPS URL"):
+        XquikCredentials(api_key="secret-key", base_url="xquik.test")
+
+
+def test_credentials_reject_empty_api_contract() -> None:
+    with pytest.raises(ValidationError, match="api_contract must not be empty"):
+        XquikCredentials(api_key="secret-key", api_contract=" ")

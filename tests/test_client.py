@@ -5,7 +5,7 @@ from typing import Any
 import httpx
 import pytest
 
-from prefect_xquik import XquikClient, XquikError
+from prefect_xquik import XquikClient, XquikError, __version__
 
 
 @pytest.mark.asyncio
@@ -37,6 +37,8 @@ async def test_search_tweets_sends_expected_headers_and_params() -> None:
     request = requests[0]
     assert request.headers["x-api-key"] == "secret-key"
     assert request.headers["xquik-api-contract"] == "2026-04-29"
+    assert request.headers["accept"] == "application/json"
+    assert request.headers["user-agent"] == f"prefect-xquik/{__version__}"
     assert request.url.path == "/x/tweets/search"
     assert request.url.params["q"] == "prefect"
     assert request.url.params["limit"] == "25"
@@ -118,6 +120,42 @@ async def test_http_error_raises_xquik_error() -> None:
     assert exc_info.value.response_text == "rate limited"
 
 
+@pytest.mark.asyncio
+async def test_invalid_json_raises_xquik_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, text="not json", request=request)
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(
+        base_url="https://api.xquik.test", transport=transport
+    ) as http_client:
+        client = XquikClient("secret-key", http_client=http_client)
+
+        with pytest.raises(XquikError, match="not valid JSON") as exc_info:
+            await client.search_users("prefect")
+
+    assert exc_info.value.status_code == 200
+    assert exc_info.value.response_text == "not json"
+
+
+@pytest.mark.asyncio
+async def test_non_object_json_raises_xquik_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=[], request=request)
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(
+        base_url="https://api.xquik.test", transport=transport
+    ) as http_client:
+        client = XquikClient("secret-key", http_client=http_client)
+
+        with pytest.raises(XquikError, match="not a JSON object") as exc_info:
+            await client.search_users("prefect")
+
+    assert exc_info.value.status_code == 200
+    assert exc_info.value.response_text == "[]"
+
+
 @pytest.mark.parametrize(
     ("method_name", "args", "error"),
     [
@@ -139,3 +177,8 @@ async def test_validation_errors(
 
     with pytest.raises(ValueError, match=error):
         await getattr(client, method_name)(*args, **kwargs)
+
+
+def test_client_rejects_invalid_base_url() -> None:
+    with pytest.raises(ValueError, match="base_url must be an HTTP or HTTPS URL"):
+        XquikClient("secret-key", base_url="xquik.test")

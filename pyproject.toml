@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "prefect-xquik"
-version = "0.1.1"
+version = "0.1.2"
 description = "Prefect collection for Xquik read workflows"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -15,11 +15,15 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Framework :: Prefect",
     "Intended Audience :: Developers",
+    "Natural Language :: English",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Typing :: Typed",
 ]
 dependencies = [
     "httpx>=0.27",
@@ -29,6 +33,7 @@ dependencies = [
 
 [project.urls]
 Documentation = "https://docs.xquik.com/api-reference/overview"
+Homepage = "https://github.com/Xquik-dev/prefect-xquik"
 Source = "https://github.com/Xquik-dev/prefect-xquik"
 
 [project.entry-points."prefect.collections"]
@@ -38,11 +43,16 @@ prefect_xquik = "prefect_xquik"
 dev = [
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
+    "pytest-env>=1.1",
     "ruff>=0.8",
+    "tomli>=2; python_version < '3.11'",
+    "twine>=6.0",
 ]
 
 [tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "session"
 asyncio_mode = "auto"
+env = ["PREFECT_TEST_MODE=1"]
 testpaths = ["tests"]
 
 [tool.ruff]
@@ -54,3 +64,6 @@ select = ["B", "E", "F", "I", "SIM", "UP"]
 
 [tool.setuptools.packages.find]
 include = ["prefect_xquik*"]
+
+[tool.setuptools.package-data]
+prefect_xquik = ["py.typed"]

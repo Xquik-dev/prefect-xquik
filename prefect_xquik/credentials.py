@@ -3,7 +3,12 @@ from __future__ import annotations
 from prefect.blocks.abstract import CredentialsBlock
 from pydantic import Field, SecretStr, field_validator
 
-from prefect_xquik.client import DEFAULT_API_CONTRACT, DEFAULT_BASE_URL, XquikClient
+from prefect_xquik.client import (
+    DEFAULT_API_CONTRACT,
+    DEFAULT_BASE_URL,
+    XquikClient,
+    _normalize_base_url,
+)
 
 
 class XquikCredentials(CredentialsBlock):
@@ -40,9 +45,14 @@ class XquikCredentials(CredentialsBlock):
     @field_validator("base_url")
     @classmethod
     def normalize_base_url(cls, value: str) -> str:
-        stripped = value.strip().rstrip("/")
+        return _normalize_base_url(value)
+
+    @field_validator("api_contract")
+    @classmethod
+    def validate_api_contract(cls, value: str) -> str:
+        stripped = value.strip()
         if not stripped:
-            raise ValueError("base_url must not be empty")
+            raise ValueError("api_contract must not be empty")
         return stripped
 
     def get_client(self) -> XquikClient:

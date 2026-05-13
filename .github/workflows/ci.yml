@@ -47,3 +47,6 @@ jobs:
 
       - name: Build package
         run: uv build
+
+      - name: Check package metadata
+        run: uv run twine check dist/*

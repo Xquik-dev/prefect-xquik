@@ -18,14 +18,18 @@ useful for scheduled research, social monitoring, and enrichment workflows:
 PyPI publication is pending. Use the pinned GitHub release artifact for now:
 
 ```bash
-pip install https://github.com/Xquik-dev/prefect-xquik/releases/download/v0.1.1/prefect_xquik-0.1.1-py3-none-any.whl
+pip install https://github.com/Xquik-dev/prefect-xquik/releases/download/v0.1.2/prefect_xquik-0.1.2-py3-none-any.whl
 ```
 
 For local development:
 
 ```bash
 uv sync
+uv run ruff format --check .
+uv run ruff check .
 uv run pytest
+uv build
+uv run twine check dist/*
 ```
 
 ## Register Blocks
@@ -42,6 +46,8 @@ from prefect_xquik import XquikCredentials
 credentials = XquikCredentials(api_key="<xquik-api-key>")
 credentials.save("xquik", overwrite=True)
 ```
+
+Store API keys in Prefect blocks, not in flow source files.
 
 ## Example Flow
 
@@ -80,6 +86,28 @@ from prefect_xquik import (
 
 All tasks accept an `XquikCredentials` block as the first argument.
 
+| Task | Xquik Endpoint |
+| --- | --- |
+| `search_tweets` | `GET /x/tweets/search` |
+| `get_tweet` | `GET /x/tweets/{id}` |
+| `search_users` | `GET /x/users/search` |
+| `get_user` | `GET /x/users/{id}` |
+| `get_user_tweets` | `GET /x/users/{id}/tweets` |
+| `get_trends` | `GET /x/trends` |
+
+Tasks return the raw Xquik JSON response as a Python dictionary. Configure
+Prefect runtime behavior with `with_options`:
+
+```python
+from prefect_xquik import search_tweets
+
+search_recent_tweets = search_tweets.with_options(
+    name="Search Recent X Posts",
+    retries=2,
+    retry_delay_seconds=10,
+)
+```
+
 ## API Contract
 
 The credentials block sends `x-api-key` and the current `xquik-api-contract`
@@ -90,9 +118,11 @@ contract used to build this collection.
 
 ```bash
 uv sync
-uv run ruff format .
+uv run ruff format --check .
 uv run ruff check .
 uv run pytest
+uv build
+uv run twine check dist/*
 ```
 
 This repository follows Prefect's external collection layout so it can be moved

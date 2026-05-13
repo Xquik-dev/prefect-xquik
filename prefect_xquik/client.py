@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import json
 from typing import Any, Literal
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 import httpx
 
+from prefect_xquik._version import __version__
+
 DEFAULT_API_CONTRACT = "2026-04-29"
 DEFAULT_BASE_URL = "https://api.xquik.com"
-USER_AGENT = "prefect-xquik/0.1.0"
+USER_AGENT = f"prefect-xquik/{__version__}"
 
 QueryType = Literal["Latest", "Top"]
 
@@ -44,15 +47,16 @@ class XquikClient:
         if timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be greater than 0")
 
-        self.api_key = api_key
-        self.api_contract = api_contract
-        self.base_url = base_url.rstrip("/")
+        self.api_key = _require_text(api_key, "api_key")
+        self.api_contract = _require_text(api_contract, "api_contract")
+        self.base_url = _normalize_base_url(base_url)
         self.http_client = http_client
         self.timeout = httpx.Timeout(timeout_seconds)
 
     @property
     def headers(self) -> dict[str, str]:
         return {
+            "Accept": "application/json",
             "User-Agent": USER_AGENT,
             "x-api-key": self.api_key,
             "xquik-api-contract": self.api_contract,
@@ -164,7 +168,23 @@ class XquikClient:
         except httpx.RequestError as exc:
             raise XquikError(f"Xquik request failed: {exc}") from exc
 
-        return response.json()
+        try:
+            payload = response.json()
+        except json.JSONDecodeError as exc:
+            raise XquikError(
+                "Xquik response was not valid JSON",
+                response_text=response.text,
+                status_code=response.status_code,
+            ) from exc
+
+        if not isinstance(payload, dict):
+            raise XquikError(
+                "Xquik response was not a JSON object",
+                response_text=response.text,
+                status_code=response.status_code,
+            )
+
+        return payload
 
 
 def _clean_params(params: dict[str, object | None]) -> dict[str, str]:
@@ -187,6 +207,14 @@ def _require_text(value: str, name: str) -> str:
     stripped = value.strip()
     if not stripped:
         raise ValueError(f"{name} must not be empty")
+    return stripped
+
+
+def _normalize_base_url(value: str) -> str:
+    stripped = _require_text(value, "base_url").rstrip("/")
+    parsed = urlparse(stripped)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise ValueError("base_url must be an HTTP or HTTPS URL")
     return stripped
 
 
