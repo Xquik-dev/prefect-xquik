@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "prefect-xquik"
-version = "0.1.2"
+version = "0.1.3"
 description = "Prefect collection for Xquik read workflows"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -32,8 +32,8 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://docs.xquik.com/api-reference/overview"
-Homepage = "https://github.com/Xquik-dev/prefect-xquik"
+Documentation = "https://docs.xquik.com/guides/prefect"
+Homepage = "https://docs.xquik.com/guides/prefect"
 Source = "https://github.com/Xquik-dev/prefect-xquik"
 
 [project.entry-points."prefect.collections"]

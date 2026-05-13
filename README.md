@@ -13,12 +13,14 @@ useful for scheduled research, social monitoring, and enrichment workflows:
 - Fetch a user's tweets
 - Fetch trends
 
+Full setup guide: https://docs.xquik.com/guides/prefect
+
 ## Install
 
 PyPI publication is pending. Use the pinned GitHub release artifact for now:
 
 ```bash
-pip install https://github.com/Xquik-dev/prefect-xquik/releases/download/v0.1.2/prefect_xquik-0.1.2-py3-none-any.whl
+pip install https://github.com/Xquik-dev/prefect-xquik/releases/download/v0.1.3/prefect_xquik-0.1.3-py3-none-any.whl
 ```
 
 For local development:

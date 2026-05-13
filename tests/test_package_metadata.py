@@ -9,8 +9,10 @@ except ModuleNotFoundError:  # pragma: no cover
 
 from prefect_xquik import __version__
 from prefect_xquik.client import USER_AGENT
+from prefect_xquik.credentials import XquikCredentials
 
 ROOT = Path(__file__).resolve().parents[1]
+PREFECT_GUIDE_URL = "https://docs.xquik.com/guides/prefect"
 
 
 def test_pyproject_version_matches_package_version() -> None:
@@ -30,3 +32,13 @@ def test_readme_install_url_matches_package_version() -> None:
 
 def test_user_agent_matches_package_version() -> None:
     assert f"prefect-xquik/{__version__}" == USER_AGENT
+
+
+def test_prefect_guide_url_is_canonical() -> None:
+    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
+    readme = (ROOT / "README.md").read_text()
+
+    assert pyproject["project"]["urls"]["Documentation"] == PREFECT_GUIDE_URL
+    assert pyproject["project"]["urls"]["Homepage"] == PREFECT_GUIDE_URL
+    assert PREFECT_GUIDE_URL in readme
+    assert XquikCredentials._documentation_url == PREFECT_GUIDE_URL

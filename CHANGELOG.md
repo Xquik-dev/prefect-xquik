@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Point package metadata, block docs, and README links at the Prefect guide.
+
 ## 0.1.2
 
 - Strengthen client and credentials validation.

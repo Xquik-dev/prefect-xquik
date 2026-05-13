@@ -15,7 +15,7 @@ class XquikCredentials(CredentialsBlock):
     """Block used to authenticate Xquik API requests."""
 
     _block_type_name = "Xquik Credentials"
-    _documentation_url = "https://docs.xquik.com/api-reference/overview"
+    _documentation_url = "https://docs.xquik.com/guides/prefect"
 
     api_key: SecretStr = Field(
         ...,
