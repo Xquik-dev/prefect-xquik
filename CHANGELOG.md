@@ -4,6 +4,7 @@
 
 - Publish the collection on PyPI and switch install instructions to
   `pip install prefect-xquik`.
+- Remove unsupported package classifier before PyPI publication.
 
 ## 0.1.4
 
