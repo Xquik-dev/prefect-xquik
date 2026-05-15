@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5
+
+- Publish the collection on PyPI and switch install instructions to
+  `pip install prefect-xquik`.
+
 ## 0.1.4
 
 - Improve README discoverability with badges, clearer title, navigation links,

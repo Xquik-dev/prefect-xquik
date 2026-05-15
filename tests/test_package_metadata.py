@@ -21,13 +21,11 @@ def test_pyproject_version_matches_package_version() -> None:
     assert pyproject["project"]["version"] == __version__
 
 
-def test_readme_install_url_matches_package_version() -> None:
+def test_readme_uses_pypi_install() -> None:
     readme = (ROOT / "README.md").read_text()
 
-    assert (
-        "https://github.com/Xquik-dev/prefect-xquik/releases/download/"
-        f"v{__version__}/prefect_xquik-{__version__}-py3-none-any.whl"
-    ) in readme
+    assert "pip install prefect-xquik" in readme
+    assert "releases/download" not in readme
 
 
 def test_user_agent_matches_package_version() -> None:

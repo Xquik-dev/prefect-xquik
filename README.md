@@ -54,10 +54,8 @@ each flow.
 
 ## Install
 
-PyPI publication is pending. Use the pinned GitHub release artifact for now:
-
 ```bash
-pip install https://github.com/Xquik-dev/prefect-xquik/releases/download/v0.1.4/prefect_xquik-0.1.4-py3-none-any.whl
+pip install prefect-xquik
 ```
 
 For local development:
