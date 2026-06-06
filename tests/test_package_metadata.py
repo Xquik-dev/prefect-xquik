@@ -13,6 +13,7 @@ from prefect_xquik.credentials import XquikCredentials
 
 ROOT = Path(__file__).resolve().parents[1]
 PREFECT_GUIDE_URL = "https://docs.xquik.com/guides/prefect"
+XQUIK_ICON_URL = "https://xquik.com/icon.svg"
 
 
 def test_pyproject_version_matches_package_version() -> None:
@@ -44,6 +45,10 @@ def test_prefect_guide_url_is_canonical() -> None:
     )
     assert PREFECT_GUIDE_URL in readme
     assert XquikCredentials._documentation_url == PREFECT_GUIDE_URL
+
+
+def test_block_logo_url_uses_public_xquik_icon() -> None:
+    assert XquikCredentials._logo_url == XQUIK_ICON_URL
 
 
 def test_package_keywords_cover_discovery_terms() -> None:

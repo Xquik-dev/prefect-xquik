@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.6
+
+- Add the public Xquik icon URL to the Prefect credentials block metadata for
+  collection registry display.
+
 ## 0.1.5
 
 - Publish the collection on PyPI and switch install instructions to
