@@ -1,24 +1,6 @@
 # Prefect tasks for Xquik X/Twitter data workflows
 
 <p align="center">
-    <a href="https://github.com/Xquik-dev/prefect-xquik/actions/workflows/ci.yml" alt="CI status">
-        <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/Xquik-dev/prefect-xquik/ci.yml?branch=main&label=CI&color=0052FF&labelColor=090422" />
-    </a>
-    <a href="https://github.com/Xquik-dev/prefect-xquik/releases" alt="GitHub release">
-        <img alt="GitHub Release" src="https://img.shields.io/github/v/release/Xquik-dev/prefect-xquik?color=0052FF&labelColor=090422" />
-    </a>
-    <a href="https://github.com/Xquik-dev/prefect-xquik/blob/main/LICENSE" alt="Apache-2.0 license">
-        <img alt="License" src="https://img.shields.io/github/license/Xquik-dev/prefect-xquik?color=0052FF&labelColor=090422" />
-    </a>
-    <a href="https://docs.xquik.com/guides/prefect" alt="Xquik Prefect guide">
-        <img alt="Docs" src="https://img.shields.io/badge/docs-Prefect_guide-0052FF?labelColor=090422" />
-    </a>
-    <a href="https://docs.prefect.io/" alt="Prefect 3 documentation">
-        <img alt="Prefect 3" src="https://img.shields.io/badge/Prefect-3.x-0052FF?labelColor=090422" />
-    </a>
-</p>
-
-<p align="center">
     <a href="https://docs.xquik.com/guides/prefect">Prefect Guide</a>
     ·
     <a href="https://github.com/Xquik-dev/prefect-xquik/releases">Releases</a>
