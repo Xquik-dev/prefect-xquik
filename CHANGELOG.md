@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Point the default API base URL at the public REST API host.
+
 ## 0.1.6
 
 - Add the public Xquik icon URL to the Prefect credentials block metadata for

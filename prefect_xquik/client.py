@@ -9,7 +9,7 @@ import httpx
 from prefect_xquik._version import __version__
 
 DEFAULT_API_CONTRACT = "2026-04-29"
-DEFAULT_BASE_URL = "https://api.xquik.com"
+DEFAULT_BASE_URL = "https://xquik.com/api/v1"
 USER_AGENT = f"prefect-xquik/{__version__}"
 
 QueryType = Literal["Latest", "Top"]

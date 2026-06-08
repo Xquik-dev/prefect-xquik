@@ -6,6 +6,14 @@ import httpx
 import pytest
 
 from prefect_xquik import XquikClient, XquikError, __version__
+from prefect_xquik.client import DEFAULT_BASE_URL
+
+
+def test_default_base_url_matches_public_rest_api() -> None:
+    client = XquikClient("secret-key")
+
+    assert DEFAULT_BASE_URL == "https://xquik.com/api/v1"
+    assert client.base_url == DEFAULT_BASE_URL
 
 
 @pytest.mark.asyncio

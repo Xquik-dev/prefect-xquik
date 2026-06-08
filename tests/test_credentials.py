@@ -21,6 +21,12 @@ def test_credentials_create_client() -> None:
     assert client.timeout.connect == 5
 
 
+def test_credentials_default_base_url_matches_public_rest_api() -> None:
+    credentials = XquikCredentials(api_key="secret-key")
+
+    assert credentials.base_url == "https://xquik.com/api/v1"
+
+
 def test_credentials_reject_empty_api_key() -> None:
     with pytest.raises(ValidationError, match="api_key must not be empty"):
         XquikCredentials(api_key=" ")
