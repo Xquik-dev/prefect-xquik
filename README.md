@@ -1,5 +1,8 @@
 # Prefect tasks for Xquik X/Twitter data workflows
 
+> **Xquik is an independent third-party service.** Not affiliated with X Corp.
+> "Twitter" and "X" are trademarks of X Corp.
+
 <p align="center">
     <a href="https://docs.xquik.com/guides/prefect">Prefect Guide</a>
     ·
