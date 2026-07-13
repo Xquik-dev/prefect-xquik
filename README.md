@@ -1,7 +1,6 @@
-# Prefect tasks for Xquik X/Twitter data workflows
+# Schedule X/Twitter data workflows with Prefect
 
-> **Xquik is an independent third-party service.** Not affiliated with X Corp.
-> "Twitter" and "X" are trademarks of X Corp.
+> **Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.**
 
 <p align="center">
     <a href="https://docs.xquik.com/guides/prefect">Prefect Guide</a>
@@ -13,11 +12,6 @@
     <a href="https://docs.prefect.io/">Prefect Docs</a>
 </p>
 
-<p align="center">
-    <strong>Guide:</strong>
-    <a href="https://docs.xquik.com/guides/prefect">https://docs.xquik.com/guides/prefect</a>
-</p>
-
 Run scheduled X/Twitter data reads in Prefect 3 flows with a reusable
 `XquikCredentials` block, async tasks, retries, and normal Prefect deployment
 patterns.
@@ -26,7 +20,7 @@ Use `prefect-xquik` when a workflow needs public X/Twitter signals for research,
 monitoring, enrichment, dashboards, or alerts without maintaining scraper code in
 each flow.
 
-## What You Can Schedule
+## What you can schedule
 
 | Workflow Need | Prefect Task | Xquik Endpoint |
 | --- | --- | --- |
@@ -54,7 +48,7 @@ uv build
 uv run twine check dist/*
 ```
 
-## Register Blocks
+## Register blocks
 
 ```bash
 prefect block register -m prefect_xquik
@@ -65,13 +59,13 @@ Create a block in the Prefect UI or with Python:
 ```python
 from prefect_xquik import XquikCredentials
 
-credentials = XquikCredentials(api_key="<xquik-api-key>")
+credentials = XquikCredentials(api_key="your_xquik_api_key_here")
 credentials.save("xquik", overwrite=True)
 ```
 
 Store API keys in Prefect blocks, not in flow source files.
 
-## Example Flow
+## Create a flow
 
 ```python
 from prefect import flow
@@ -93,7 +87,7 @@ async def social_signal_flow() -> dict:
     return {"tweets": tweets, "trends": trends}
 ```
 
-## Task Imports
+## Import tasks
 
 ```python
 from prefect_xquik import (
@@ -119,7 +113,7 @@ search_recent_tweets = search_tweets.with_options(
 )
 ```
 
-## API Contract
+## API contract
 
 The credentials block sends `x-api-key` and the current `xquik-api-contract`
 header. The default contract is `2026-04-29`, matching the public OpenAPI
