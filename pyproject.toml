@@ -39,7 +39,7 @@ classifiers = [
 dependencies = [
     "httpx>=0.27",
     "pydantic>=2",
-    "prefect>=3.0.0",
+    "prefect>=3.7.7",
 ]
 
 [project.urls]
