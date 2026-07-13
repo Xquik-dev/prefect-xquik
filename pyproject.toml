@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=75", "wheel"]
+requires = ["setuptools>=83.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -38,8 +38,8 @@ classifiers = [
 ]
 dependencies = [
     "httpx>=0.27",
-    "pydantic>=2",
-    "prefect>=3.0.0",
+    "pydantic>=2.13.4",
+    "prefect>=3.7.8",
 ]
 
 [project.urls]
@@ -55,12 +55,12 @@ prefect_xquik = "prefect_xquik"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3",
+    "pytest>=9.1.1",
     "pytest-asyncio>=0.24",
     "pytest-env>=1.1",
     "ruff>=0.8",
     "tomli>=2; python_version < '3.11'",
-    "twine>=6.0",
+    "twine>=6.2.0",
 ]
 
 [tool.pytest.ini_options]
