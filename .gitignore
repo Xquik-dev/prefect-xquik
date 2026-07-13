@@ -7,5 +7,4 @@ build/
 *.egg-info/
 .coverage
 htmlcov/
-uv.lock
 .DS_Store
