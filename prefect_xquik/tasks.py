@@ -27,8 +27,8 @@ async def search_tweets(
         cursor: Pagination cursor from a previous response.
         limit: Maximum number of tweets to return. Must be between 1 and 200.
         query_type: Search mode. Use `Latest` or `Top`.
-        since_time: Optional Unix timestamp lower bound.
-        until_time: Optional Unix timestamp upper bound.
+        since_time: Optional ISO 8601 timestamp lower bound.
+        until_time: Optional ISO 8601 timestamp upper bound.
 
     Returns:
         Raw Xquik paginated tweets response.
