@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "prefect-xquik"
-version = "0.1.7"
+version = "0.1.8"
 description = "Prefect collection for scheduled X/Twitter data workflows with Xquik. Not affiliated with X Corp."
 readme = "README.md"
 requires-python = ">=3.10"
