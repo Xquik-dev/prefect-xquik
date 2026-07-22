@@ -2,6 +2,8 @@
 
 > **Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.**
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13728/badge)](https://www.bestpractices.dev/projects/13728)
+
 <p align="center">
     <a href="https://docs.xquik.com/guides/prefect">Prefect Guide</a>
     ·
