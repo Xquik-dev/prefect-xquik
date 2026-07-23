@@ -1,4 +1,4 @@
-# Schedule X/Twitter Data Workflows with Prefect
+# Schedule Tweet Search, Timelines & X Data Workflows with Prefect
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13728/badge)](https://www.bestpractices.dev/projects/13728)
 
@@ -6,14 +6,17 @@ Run Xquik reads in Prefect 3 flows. Use reusable credentials, async tasks, and P
 
 ## Available Tasks
 
-| Workflow Need | Prefect Task | Xquik Endpoint |
+| Customer question | Prefect task | Xquik endpoint |
 | --- | --- | --- |
-| Search recent or top posts | `search_tweets` | `GET /x/tweets/search` |
-| Look up a specific post | `get_tweet` | `GET /x/tweets/{id}` |
-| Search public users | `search_users` | `GET /x/users/search` |
-| Look up a user profile | `get_user` | `GET /x/users/{id}` |
-| Fetch a user's timeline | `get_user_tweets` | `GET /x/users/{id}/tweets` |
-| Read regional or global trends | `get_trends` | `GET /x/trends` |
+| How can I schedule tweet searches? | `search_tweets` | `GET /x/tweets/search` |
+| How can I retrieve one post? | `get_tweet` | `GET /x/tweets/{id}` |
+| How can I search public users? | `search_users` | `GET /x/users/search` |
+| How can I enrich records with profiles? | `get_user` | `GET /x/users/{id}` |
+| How can I snapshot a profile timeline? | `get_user_tweets` | `GET /x/users/{id}/tweets` |
+| How can I watch regional trends? | `get_trends` | `GET /x/trends` |
+
+This package exposes 6 read-only tasks.
+Use the [REST API](https://docs.xquik.com/api-reference/overview) for follower exports or writes.
 
 ## Install
 
