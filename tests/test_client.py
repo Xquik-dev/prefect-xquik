@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Xquik Contributors
+# SPDX-License-Identifier: Apache-2.0
+
 from __future__ import annotations
 
 from typing import Any
@@ -14,6 +17,20 @@ def test_default_base_url_matches_public_rest_api() -> None:
 
     assert DEFAULT_BASE_URL == "https://xquik.com/api/v1"
     assert client.base_url == DEFAULT_BASE_URL
+
+
+@pytest.mark.parametrize(
+    ("api_key", "timeout_seconds", "error"),
+    [
+        (" ", 30, "api_key must not be empty"),
+        ("secret-key", 0, "timeout_seconds must be greater than 0"),
+    ],
+)
+def test_client_rejects_invalid_constructor_values(
+    api_key: str, timeout_seconds: float, error: str
+) -> None:
+    with pytest.raises(ValueError, match=error):
+        XquikClient(api_key, timeout_seconds=timeout_seconds)
 
 
 @pytest.mark.asyncio
@@ -103,11 +120,70 @@ async def test_get_user_tweets_strips_at_prefix_and_serializes_booleans() -> Non
 
 
 @pytest.mark.asyncio
-async def test_get_trends_validates_count() -> None:
+async def test_get_user_and_default_timeline_parameters() -> None:
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(200, json={})
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(
+        base_url="https://api.xquik.test", transport=transport
+    ) as http_client:
+        client = XquikClient("secret-key", http_client=http_client)
+        user = await client.get_user("prefect")
+        tweets = await client.get_user_tweets("prefect")
+
+    assert user == {}
+    assert tweets == {}
+    assert [request.url.path for request in requests] == [
+        "/x/users/prefect",
+        "/x/users/prefect/tweets",
+    ]
+    assert requests[1].url.params["includeParentTweet"] == "false"
+    assert requests[1].url.params["includeReplies"] == "false"
+
+
+@pytest.mark.parametrize("count", [0, 51])
+@pytest.mark.asyncio
+async def test_get_trends_validates_count(count: int) -> None:
     client = XquikClient("secret-key")
 
     with pytest.raises(ValueError, match="count must be between 1 and 50"):
-        await client.get_trends(count=51)
+        await client.get_trends(count=count)
+
+
+@pytest.mark.asyncio
+async def test_get_trends_validates_woeid() -> None:
+    client = XquikClient("secret-key")
+
+    with pytest.raises(ValueError, match="woeid must be greater than 0"):
+        await client.get_trends(woeid=0)
+
+
+@pytest.mark.asyncio
+async def test_internal_http_client_context() -> None:
+    client_settings: dict[str, object] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"trends": []}, request=request)
+
+    transport = httpx.MockTransport(handler)
+    async_client = httpx.AsyncClient
+
+    def client_factory(*, base_url: str, timeout: httpx.Timeout) -> httpx.AsyncClient:
+        client_settings.update(base_url=base_url, timeout=timeout)
+        return async_client(base_url=base_url, timeout=timeout, transport=transport)
+
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(httpx, "AsyncClient", client_factory)
+        client = XquikClient("secret-key", base_url="https://api.xquik.test")
+        result = await client.get_trends()
+
+    assert result == {"trends": []}
+    assert client_settings["base_url"] == "https://api.xquik.test"
+    assert client_settings["timeout"] == httpx.Timeout(30)
 
 
 @pytest.mark.asyncio
@@ -126,6 +202,21 @@ async def test_http_error_raises_xquik_error() -> None:
 
     assert exc_info.value.status_code == 429
     assert exc_info.value.response_text == "rate limited"
+
+
+@pytest.mark.asyncio
+async def test_request_error_raises_xquik_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("offline", request=request)
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(
+        base_url="https://api.xquik.test", transport=transport
+    ) as http_client:
+        client = XquikClient("secret-key", http_client=http_client)
+
+        with pytest.raises(XquikError, match="Xquik request failed: offline"):
+            await client.search_users("prefect")
 
 
 @pytest.mark.asyncio
@@ -187,6 +278,16 @@ async def test_validation_errors(
         await getattr(client, method_name)(*args, **kwargs)
 
 
-def test_client_rejects_invalid_base_url() -> None:
+@pytest.mark.parametrize("base_url", ["xquik.test", "https:///path"])
+def test_client_rejects_invalid_base_url(base_url: str) -> None:
     with pytest.raises(ValueError, match="base_url must be an HTTP or HTTPS URL"):
-        XquikClient("secret-key", base_url="xquik.test")
+        XquikClient("secret-key", base_url=base_url)
+
+
+@pytest.mark.parametrize("limit", [0, 201])
+@pytest.mark.asyncio
+async def test_search_tweets_validates_limit(limit: int) -> None:
+    client = XquikClient("secret-key")
+
+    with pytest.raises(ValueError, match="limit must be between 1 and 200"):
+        await client.search_tweets("prefect", limit=limit)

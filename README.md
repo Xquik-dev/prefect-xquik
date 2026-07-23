@@ -106,9 +106,14 @@ The credentials block sends `x-api-key` and `xquik-api-contract: 2026-04-29`.
 uv sync
 uv run ruff format --check .
 uv run ruff check .
+uv run pip-audit
 uv run pytest
-uv build
+./scripts/build_reproducibly.sh
 uv run twine check dist/*
 ```
+
+`uv run pytest` enforces 100% statement, branch, function, and line coverage.
+CI also verifies REUSE 3.3 licensing and dependency audits.
+CI builds every distribution twice and compares each byte.
 
 Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Xquik Contributors
+# SPDX-License-Identifier: Apache-2.0
+
 from __future__ import annotations
 
 import re
@@ -27,6 +30,16 @@ def test_pyproject_version_matches_package_version() -> None:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
 
     assert pyproject["project"]["version"] == __version__
+
+
+def test_build_backend_is_pinned() -> None:
+    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
+
+    assert pyproject["build-system"]["requires"] == ["hatchling==1.31.0"]
+    assert pyproject["build-system"]["build-backend"] == "hatchling.build"
+    assert pyproject["tool"]["hatch"]["build"]["targets"]["wheel"]["packages"] == [
+        "prefect_xquik"
+    ]
 
 
 def test_readme_uses_pypi_install() -> None:
@@ -69,6 +82,18 @@ def test_publish_workflow_requires_exact_release_tag_on_main() -> None:
     assert "default branch tip" in workflow
     assert workflow.count("id-token: write") == 1
     assert "attestations: true" in workflow
+
+
+def test_ci_and_release_builds_are_reproducible() -> None:
+    for workflow_name in ("ci.yml", "publish.yml"):
+        workflow = (ROOT / ".github" / "workflows" / workflow_name).read_text()
+
+        assert "run: ./scripts/build_reproducibly.sh" in workflow
+
+    script = (ROOT / "scripts" / "build_reproducibly.sh").read_text()
+    assert 'SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"' in script
+    assert 'reproducible_dir="$(mktemp -d)"' in script
+    assert 'cmp "$artifact"' in script
 
 
 def test_user_agent_matches_package_version() -> None:

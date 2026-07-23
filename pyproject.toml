@@ -1,6 +1,9 @@
+# SPDX-FileCopyrightText: 2026 Xquik Contributors
+# SPDX-License-Identifier: Apache-2.0
+
 [build-system]
-requires = ["setuptools>=83.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling==1.31.0"]
+build-backend = "hatchling.build"
 
 [project]
 name = "prefect-xquik"
@@ -55,8 +58,10 @@ prefect_xquik = "prefect_xquik"
 
 [dependency-groups]
 dev = [
+    "pip-audit==2.10.1",
     "pytest>=9.1.1",
     "pytest-asyncio>=0.24",
+    "pytest-cov==7.1.0",
     "pytest-env>=1.1",
     "ruff>=0.8",
     "tomli>=2; python_version < '3.11'",
@@ -64,10 +69,24 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
+addopts = [
+    "--cov=prefect_xquik",
+    "--cov-branch",
+    "--cov-report=term-missing",
+    "--cov-fail-under=100",
+]
 asyncio_default_fixture_loop_scope = "session"
 asyncio_mode = "auto"
 env = ["PREFECT_TEST_MODE=1"]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["prefect_xquik"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
 
 [tool.ruff]
 line-length = 88
@@ -76,8 +95,5 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["B", "E", "F", "I", "SIM", "UP"]
 
-[tool.setuptools.packages.find]
-include = ["prefect_xquik*"]
-
-[tool.setuptools.package-data]
-prefect_xquik = ["py.typed"]
+[tool.hatch.build.targets.wheel]
+packages = ["prefect_xquik"]
