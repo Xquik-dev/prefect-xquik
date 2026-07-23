@@ -1,5 +1,8 @@
 #!/bin/bash -eu
 
+# SPDX-FileCopyrightText: 2026 Xquik Contributors
+# SPDX-License-Identifier: Apache-2.0
+
 export PYTHONPATH="$SRC/prefect-xquik"
 
 compile_python_fuzzer \

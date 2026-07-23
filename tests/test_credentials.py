@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Xquik Contributors
+# SPDX-License-Identifier: Apache-2.0
+
 from __future__ import annotations
 
 import pytest
@@ -9,6 +12,7 @@ from prefect_xquik import XquikCredentials
 def test_credentials_create_client() -> None:
     credentials = XquikCredentials(
         api_key="secret-key",
+        api_contract=" 2026-04-29 ",
         base_url="https://api.xquik.test/",
         timeout_seconds=5,
     )

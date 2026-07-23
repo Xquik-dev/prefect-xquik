@@ -6,8 +6,9 @@ Run all commands from the repository root.
 uv sync
 uv run ruff format --check .
 uv run ruff check .
+uv run pip-audit
 uv run pytest
-uv build
+./scripts/build_reproducibly.sh
 uv run twine check dist/*
 ```
 

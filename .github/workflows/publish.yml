@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Xquik Contributors
+# SPDX-License-Identifier: Apache-2.0
+
 name: Publish to PyPI
 
 on:
@@ -77,11 +80,14 @@ jobs:
       - name: Lint
         run: uv run ruff check .
 
+      - name: Audit dependencies
+        run: uv run pip-audit
+
       - name: Test
         run: uv run pytest
 
-      - name: Build package
-        run: uv build
+      - name: Build package reproducibly
+        run: ./scripts/build_reproducibly.sh
 
       - name: Check package metadata
         run: uv run twine check dist/*
