@@ -1,28 +1,10 @@
-# Schedule X/Twitter data workflows with Prefect
-
-> **Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.**
+# Schedule X/Twitter Data Workflows with Prefect
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13728/badge)](https://www.bestpractices.dev/projects/13728)
 
-<p align="center">
-    <a href="https://docs.xquik.com/guides/prefect">Prefect Guide</a>
-    ·
-    <a href="https://github.com/Xquik-dev/prefect-xquik/releases">Releases</a>
-    ·
-    <a href="https://docs.xquik.com/api-reference/overview">Xquik API Reference</a>
-    ·
-    <a href="https://docs.prefect.io/">Prefect Docs</a>
-</p>
+Run Xquik reads in Prefect 3 flows. Use reusable credentials, async tasks, and Prefect retries.
 
-Run scheduled X/Twitter data reads in Prefect 3 flows with a reusable
-`XquikCredentials` block, async tasks, retries, and normal Prefect deployment
-patterns.
-
-Use `prefect-xquik` when a workflow needs public X/Twitter signals for research,
-monitoring, enrichment, dashboards, or alerts without maintaining scraper code in
-each flow.
-
-## What you can schedule
+## Available Tasks
 
 | Workflow Need | Prefect Task | Xquik Endpoint |
 | --- | --- | --- |
@@ -39,18 +21,7 @@ each flow.
 pip install prefect-xquik
 ```
 
-For local development:
-
-```bash
-uv sync
-uv run ruff format --check .
-uv run ruff check .
-uv run pytest
-uv build
-uv run twine check dist/*
-```
-
-## Register blocks
+## Register Blocks
 
 ```bash
 prefect block register -m prefect_xquik
@@ -67,7 +38,7 @@ credentials.save("xquik", overwrite=True)
 
 Store API keys in Prefect blocks, not in flow source files.
 
-## Create a flow
+## Create a Flow
 
 ```python
 from prefect import flow
@@ -89,7 +60,7 @@ async def social_signal_flow() -> dict:
     return {"tweets": tweets, "trends": trends}
 ```
 
-## Import tasks
+## Import Tasks
 
 ```python
 from prefect_xquik import (
@@ -115,11 +86,9 @@ search_recent_tweets = search_tweets.with_options(
 )
 ```
 
-## API contract
+## API Contract
 
-The credentials block sends `x-api-key` and the current `xquik-api-contract`
-header. The default contract is `2026-04-29`, matching the public OpenAPI
-contract used to build this collection.
+The credentials block sends `x-api-key` and `xquik-api-contract: 2026-04-29`.
 
 ## Documentation
 
@@ -139,5 +108,4 @@ uv build
 uv run twine check dist/*
 ```
 
-This repository follows Prefect's external collection layout so it can be moved
-under `src/integrations/prefect-xquik` later if Prefect maintainers request it.
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
