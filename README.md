@@ -4,6 +4,8 @@
 
 Run Xquik reads in Prefect 3 flows. Use reusable credentials, async tasks, and Prefect retries.
 
+Choose this integration for scheduled ingestion and downstream Prefect tasks.
+
 ## Available Tasks
 
 | Customer question | Prefect task | Xquik endpoint |
@@ -99,6 +101,9 @@ The credentials block sends `x-api-key` and `xquik-api-contract: 2026-04-29`.
 - [Xquik API reference](https://docs.xquik.com/api-reference/overview)
 - [Prefect integrations guide](https://docs.prefect.io/integrations/integrations)
 - [Prefect workflows and tasks](https://docs.prefect.io/v3/how-to-guides/workflows/write-and-run)
+- [Organization support policy](https://github.com/Xquik-dev/.github/blob/main/SUPPORT.md)
+- [Security policy](SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
 
 ## Development
 
