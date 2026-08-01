@@ -14,12 +14,6 @@ on:
       - "uv.lock"
   pull_request:
     branches: [main]
-    paths:
-      - ".clusterfuzzlite/**"
-      - ".github/workflows/fuzz.yml"
-      - "prefect_xquik/**"
-      - "pyproject.toml"
-      - "uv.lock"
   schedule:
     - cron: "43 4 * * 1"
   workflow_dispatch:
