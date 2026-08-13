@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.9
+
+- Publish the reproducible Hatch build and complete license metadata.
+- Add continuous fuzzing and enforce 100% branch coverage.
+- Clarify common social-signal workflows and API contracts.
+
+## 0.1.8
+
+- Refresh the Prefect dependency floor and supply-chain checks.
+
 ## 0.1.7
 
 - Point the default API base URL at the public REST API host.
