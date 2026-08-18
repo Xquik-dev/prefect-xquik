@@ -191,15 +191,11 @@ class XquikClient:
 
 
 def _clean_params(params: dict[str, object | None]) -> dict[str, str]:
-    cleaned: dict[str, str] = {}
-    for key, value in params.items():
-        if value is None:
-            continue
-        if isinstance(value, bool):
-            cleaned[key] = "true" if value else "false"
-        else:
-            cleaned[key] = str(value)
-    return cleaned
+    return {
+        key: str(value).lower() if isinstance(value, bool) else str(value)
+        for key, value in params.items()
+        if value is not None
+    }
 
 
 def _quote_path_part(value: str, name: str) -> str:
