@@ -14,6 +14,9 @@ from prefect_xquik import XquikClient, XquikError, __version__
 from prefect_xquik.client import DEFAULT_BASE_URL
 
 Handler = Callable[[httpx.Request], httpx.Response]
+LIMIT_ERROR = "limit is invalid. Enter a value from 1 to 200."
+COUNT_ERROR = "count is invalid. Enter a value from 1 to 50."
+WOEID_ERROR = "woeid is invalid. Enter a positive location ID."
 
 
 @asynccontextmanager
@@ -25,7 +28,7 @@ async def mock_client(handler: Handler) -> AsyncIterator[XquikClient]:
         yield XquikClient("secret-key", http_client=http_client)
 
 
-def test_default_base_url_matches_public_rest_api() -> None:
+def test_client_uses_public_rest_api_by_default() -> None:
     assert DEFAULT_BASE_URL == "https://xquik.com/api/v1"
     assert XquikClient("secret-key").base_url == DEFAULT_BASE_URL
 
@@ -33,25 +36,25 @@ def test_default_base_url_matches_public_rest_api() -> None:
 @pytest.mark.parametrize(
     ("api_key", "kwargs", "error"),
     [
-        (" ", {}, "api_key must not be empty"),
+        (" ", {}, "api_key is empty. Add an Xquik API key."),
         (
             "secret-key",
             {"timeout_seconds": 0},
-            "timeout_seconds must be greater than 0",
+            "timeout_seconds is invalid. Enter a positive number.",
         ),
         (
             "secret-key",
             {"base_url": "xquik.test"},
-            "base_url must be an HTTP or HTTPS URL",
+            "base_url is invalid. Enter a complete HTTP or HTTPS URL.",
         ),
         (
             "secret-key",
             {"base_url": "https:///path"},
-            "base_url must be an HTTP or HTTPS URL",
+            "base_url is invalid. Enter a complete HTTP or HTTPS URL.",
         ),
     ],
 )
-def test_client_rejects_invalid_constructor_values(
+def test_client_explains_invalid_constructor_values(
     api_key: str,
     kwargs: dict[str, Any],
     error: str,
@@ -61,7 +64,7 @@ def test_client_rejects_invalid_constructor_values(
 
 
 @pytest.mark.asyncio
-async def test_search_tweets_sends_expected_headers_and_params() -> None:
+async def test_twitter_search_sends_contract_headers_and_query_params() -> None:
     requests: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -90,7 +93,7 @@ async def test_search_tweets_sends_expected_headers_and_params() -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_tweet_url_encodes_path_parts() -> None:
+async def test_tweet_lookup_encodes_the_id_as_one_path_segment() -> None:
     requests: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -105,7 +108,7 @@ async def test_get_tweet_url_encodes_path_parts() -> None:
 
 
 @pytest.mark.asyncio
-async def test_user_routes_normalize_identifiers_and_defaults() -> None:
+async def test_user_routes_remove_at_prefixes_and_send_default_flags() -> None:
     requests: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -136,7 +139,7 @@ async def test_user_routes_normalize_identifiers_and_defaults() -> None:
 
 
 @pytest.mark.asyncio
-async def test_internal_http_client_context() -> None:
+async def test_client_creates_an_http_session_when_none_is_supplied() -> None:
     client_settings: dict[str, object] = {}
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -166,7 +169,7 @@ async def test_internal_http_client_context() -> None:
 
 
 @pytest.mark.asyncio
-async def test_http_error_raises_xquik_error() -> None:
+async def test_http_status_error_preserves_status_and_response_text() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(429, text="rate limited", request=request)
 
@@ -179,21 +182,21 @@ async def test_http_error_raises_xquik_error() -> None:
 
 
 @pytest.mark.asyncio
-async def test_request_error_raises_xquik_error() -> None:
+async def test_connection_error_identifies_the_failed_xquik_request() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("offline", request=request)
 
     async with mock_client(handler) as client:
-        with pytest.raises(XquikError, match="Xquik request failed: offline"):
+        with pytest.raises(XquikError, match="Xquik API request failed: offline"):
             await client.search_users("prefect")
 
 
 @pytest.mark.parametrize(
     ("payload", "message", "response_text"),
-    [("not json", "not valid JSON", "not json"), ([], "not a JSON object", "[]")],
+    [("not json", "invalid JSON", "not json"), ([], "unexpected JSON", "[]")],
 )
 @pytest.mark.asyncio
-async def test_invalid_response_payload_raises_xquik_error(
+async def test_invalid_response_explains_how_to_inspect_the_payload(
     payload: str | list[object],
     message: str,
     response_text: str,
@@ -214,35 +217,25 @@ async def test_invalid_response_payload_raises_xquik_error(
 @pytest.mark.parametrize(
     ("method_name", "args", "kwargs", "error"),
     [
-        ("search_tweets", ("",), {}, "q must not be empty"),
+        ("search_tweets", ("",), {}, "q is empty. Enter a value."),
         (
             "search_tweets",
             ("prefect",),
             {"query_type": "Mixed"},
-            'query_type must be "Latest" or "Top"',
+            'query_type is invalid. Use "Latest" or "Top".',
         ),
-        (
-            "search_tweets",
-            ("prefect",),
-            {"limit": 0},
-            "limit must be between 1 and 200",
-        ),
-        (
-            "search_tweets",
-            ("prefect",),
-            {"limit": 201},
-            "limit must be between 1 and 200",
-        ),
-        ("search_users", ("",), {}, "q must not be empty"),
-        ("get_user", ("@",), {}, "user_id must not be empty"),
-        ("get_tweet", ("",), {}, "tweet_id must not be empty"),
-        ("get_trends", (), {"count": 0}, "count must be between 1 and 50"),
-        ("get_trends", (), {"count": 51}, "count must be between 1 and 50"),
-        ("get_trends", (), {"woeid": 0}, "woeid must be greater than 0"),
+        ("search_tweets", ("prefect",), {"limit": 0}, LIMIT_ERROR),
+        ("search_tweets", ("prefect",), {"limit": 201}, LIMIT_ERROR),
+        ("search_users", ("",), {}, "q is empty. Enter a value."),
+        ("get_user", ("@",), {}, "user_id is empty. Enter a value."),
+        ("get_tweet", ("",), {}, "tweet_id is empty. Enter a value."),
+        ("get_trends", (), {"count": 0}, COUNT_ERROR),
+        ("get_trends", (), {"count": 51}, COUNT_ERROR),
+        ("get_trends", (), {"woeid": 0}, WOEID_ERROR),
     ],
 )
 @pytest.mark.asyncio
-async def test_validation_errors(
+async def test_public_methods_return_actionable_validation_errors(
     method_name: str,
     args: tuple[str, ...],
     kwargs: dict[str, Any],

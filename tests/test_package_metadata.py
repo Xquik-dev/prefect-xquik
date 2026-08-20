@@ -26,13 +26,13 @@ COMPACT_AFFILIATION_NOTICE = "Not affiliated with X Corp."
 ACTION_REFERENCE = re.compile(r"[^@\s]+@[0-9a-f]{40}")
 
 
-def test_pyproject_version_matches_package_version() -> None:
+def test_pyproject_and_package_versions_match() -> None:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
 
     assert pyproject["project"]["version"] == __version__
 
 
-def test_build_backend_is_pinned() -> None:
+def test_build_backend_and_package_path_are_fixed() -> None:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
 
     assert pyproject["build-system"]["requires"] == ["hatchling==1.31.0"]
@@ -42,14 +42,14 @@ def test_build_backend_is_pinned() -> None:
     ]
 
 
-def test_readme_uses_pypi_install() -> None:
+def test_readme_installs_the_pypi_package() -> None:
     readme = (ROOT / "README.md").read_text()
 
     assert "pip install prefect-xquik" in readme
     assert "releases/download" not in readme
 
 
-def test_public_metadata_has_affiliation_notices() -> None:
+def test_readme_and_package_metadata_have_affiliation_notices() -> None:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
     readme = (ROOT / "README.md").read_text()
 
@@ -57,7 +57,7 @@ def test_public_metadata_has_affiliation_notices() -> None:
     assert COMPACT_AFFILIATION_NOTICE in pyproject["project"]["description"]
 
 
-def test_workflow_actions_are_pinned_to_commit_shas() -> None:
+def test_every_workflow_action_uses_an_immutable_commit() -> None:
     for workflow_path in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
         action_lines = [
             line.strip()
@@ -68,23 +68,23 @@ def test_workflow_actions_are_pinned_to_commit_shas() -> None:
         for action_line in action_lines:
             action = action_line.removeprefix("uses:").partition("#")[0].strip()
             assert ACTION_REFERENCE.fullmatch(action), (
-                f"Unpinned action in {workflow_path}: {action}"
+                f"Workflow action is not pinned in {workflow_path}: {action}"
             )
 
 
-def test_publish_workflow_requires_exact_release_tag_on_main() -> None:
+def test_publish_workflow_requires_the_release_tag_on_main() -> None:
     workflow = (ROOT / ".github" / "workflows" / "publish.yml").read_text()
 
     assert "workflow_dispatch" not in workflow
     assert "ref: ${{ github.event.release.tag_name }}" in workflow
     assert "refs/tags/${RELEASE_TAG}^{commit}" in workflow
     assert "refs/remotes/origin/main" in workflow
-    assert "default branch tip" in workflow
+    assert "main branch tip" in workflow
     assert workflow.count("id-token: write") == 1
     assert "attestations: true" in workflow
 
 
-def test_ci_and_release_builds_are_reproducible() -> None:
+def test_ci_and_releases_compare_repeated_builds() -> None:
     for workflow_name in ("ci.yml", "publish.yml"):
         workflow = (ROOT / ".github" / "workflows" / workflow_name).read_text()
 
@@ -96,11 +96,11 @@ def test_ci_and_release_builds_are_reproducible() -> None:
     assert 'cmp "$artifact"' in script
 
 
-def test_user_agent_matches_package_version() -> None:
+def test_user_agent_includes_the_package_version() -> None:
     assert f"prefect-xquik/{__version__}" == USER_AGENT
 
 
-def test_prefect_guide_url_is_canonical() -> None:
+def test_public_links_use_the_canonical_prefect_guide() -> None:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
     readme = (ROOT / "README.md").read_text()
 
@@ -114,19 +114,21 @@ def test_prefect_guide_url_is_canonical() -> None:
     assert XquikCredentials._documentation_url == PREFECT_GUIDE_URL
 
 
-def test_block_logo_url_uses_public_xquik_icon() -> None:
+def test_credentials_block_uses_the_public_xquik_icon() -> None:
     assert XquikCredentials._logo_url == XQUIK_ICON_URL
 
 
-def test_package_keywords_cover_discovery_terms() -> None:
+def test_package_keywords_cover_approved_search_terms() -> None:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
 
     assert {
         "data-pipelines",
         "prefect-collection",
         "prefect-integration",
+        "social-media-api",
+        "tweet-search",
         "twitter-api",
+        "twitter-search",
         "workflow-orchestration",
-        "x-twitter",
         "xquik",
     }.issubset(set(pyproject["project"]["keywords"]))

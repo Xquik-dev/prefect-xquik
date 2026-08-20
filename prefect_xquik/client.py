@@ -19,7 +19,7 @@ QueryType = Literal["Latest", "Top"]
 
 
 class XquikError(RuntimeError):
-    """Raised when an Xquik request fails."""
+    """A failed Xquik API request."""
 
     def __init__(
         self,
@@ -34,7 +34,7 @@ class XquikError(RuntimeError):
 
 
 class XquikClient:
-    """Async client for selected Xquik REST API endpoints."""
+    """Call Xquik Twitter search, profile, timeline, and trend endpoints."""
 
     def __init__(
         self,
@@ -46,9 +46,9 @@ class XquikClient:
         timeout_seconds: float = 30.0,
     ) -> None:
         if not api_key.strip():
-            raise ValueError("api_key must not be empty")
+            raise ValueError("api_key is empty. Add an Xquik API key.")
         if timeout_seconds <= 0:
-            raise ValueError("timeout_seconds must be greater than 0")
+            raise ValueError("timeout_seconds is invalid. Enter a positive number.")
 
         self.api_key = _require_text(api_key, "api_key")
         self.api_contract = _require_text(api_contract, "api_contract")
@@ -77,9 +77,9 @@ class XquikClient:
     ) -> dict[str, Any]:
         query = _require_text(q, "q")
         if query_type not in {"Latest", "Top"}:
-            raise ValueError('query_type must be "Latest" or "Top"')
+            raise ValueError('query_type is invalid. Use "Latest" or "Top".')
         if limit is not None and not 1 <= limit <= 200:
-            raise ValueError("limit must be between 1 and 200")
+            raise ValueError("limit is invalid. Enter a value from 1 to 200.")
 
         return await self._get_json(
             "/x/tweets/search",
@@ -129,9 +129,9 @@ class XquikClient:
 
     async def get_trends(self, *, count: int = 30, woeid: int = 1) -> dict[str, Any]:
         if count < 1 or count > 50:
-            raise ValueError("count must be between 1 and 50")
+            raise ValueError("count is invalid. Enter a value from 1 to 50.")
         if woeid < 1:
-            raise ValueError("woeid must be greater than 0")
+            raise ValueError("woeid is invalid. Enter a positive location ID.")
 
         return await self._get_json(
             "/x/trends", params={"count": count, "woeid": woeid}
@@ -164,25 +164,26 @@ class XquikClient:
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
             raise XquikError(
-                f"Xquik request failed with status {exc.response.status_code}",
+                f"Xquik API request failed (HTTP {exc.response.status_code}). "
+                "Inspect response_text.",
                 response_text=exc.response.text,
                 status_code=exc.response.status_code,
             ) from exc
         except httpx.RequestError as exc:
-            raise XquikError(f"Xquik request failed: {exc}") from exc
+            raise XquikError(f"Xquik API request failed: {exc}") from exc
 
         try:
             payload = response.json()
         except json.JSONDecodeError as exc:
             raise XquikError(
-                "Xquik response was not valid JSON",
+                "Xquik returned invalid JSON. Retry or inspect response_text.",
                 response_text=response.text,
                 status_code=response.status_code,
             ) from exc
 
         if not isinstance(payload, dict):
             raise XquikError(
-                "Xquik response was not a JSON object",
+                "Xquik returned an unexpected JSON value. Inspect response_text.",
                 response_text=response.text,
                 status_code=response.status_code,
             )
@@ -205,7 +206,7 @@ def _quote_path_part(value: str, name: str) -> str:
 def _require_text(value: str, name: str) -> str:
     stripped = value.strip()
     if not stripped:
-        raise ValueError(f"{name} must not be empty")
+        raise ValueError(f"{name} is empty. Enter a value.")
     return stripped
 
 
@@ -213,7 +214,7 @@ def _normalize_base_url(value: str) -> str:
     stripped = _require_text(value, "base_url").rstrip("/")
     parsed = urlparse(stripped)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-        raise ValueError("base_url must be an HTTP or HTTPS URL")
+        raise ValueError("base_url is invalid. Enter a complete HTTP or HTTPS URL.")
     return stripped
 
 

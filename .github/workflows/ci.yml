@@ -36,7 +36,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check License Metadata
+      - name: Check license metadata
         uses: fsfe/reuse-action@676e2d560c9a403aa252096d99fcab3e1132b0f5 # v6.0.0
 
       - name: Install uv

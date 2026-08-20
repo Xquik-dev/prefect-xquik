@@ -16,5 +16,5 @@ uv build --out-dir "$reproducible_dir"
 for artifact in "$output_dir"/*; do
   artifact_name="$(basename "$artifact")"
   cmp "$artifact" "$reproducible_dir/$artifact_name"
-  printf 'Reproducible: %s\n' "$artifact_name"
+  printf 'Verified reproducible artifact: %s\n' "$artifact_name"
 done

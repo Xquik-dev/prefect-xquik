@@ -1,24 +1,23 @@
-# Schedule Tweet Search, Timelines & X Data Workflows with Prefect
+# Schedule Twitter search, timelines & X API workflows with Prefect
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13728/badge)](https://www.bestpractices.dev/projects/13728)
 
-Run Xquik reads in Prefect 3 flows. Use reusable credentials, async tasks, and Prefect retries.
+Run Twitter search, profile, timeline, and trend tasks in Prefect 3 flows. Store
+X API keys in Prefect blocks and use native async tasks and retries.
 
-Choose this integration for scheduled ingestion and downstream Prefect tasks.
+## Pick a task
 
-## Available Tasks
-
-| Customer question | Prefect task | Xquik endpoint |
+| Workflow step | Prefect task | Xquik endpoint |
 | --- | --- | --- |
-| How can I schedule tweet searches? | `search_tweets` | `GET /x/tweets/search` |
-| How can I retrieve one post? | `get_tweet` | `GET /x/tweets/{id}` |
-| How can I search public users? | `search_users` | `GET /x/users/search` |
-| How can I enrich records with profiles? | `get_user` | `GET /x/users/{id}` |
-| How can I snapshot a profile timeline? | `get_user_tweets` | `GET /x/users/{id}/tweets` |
-| How can I watch regional trends? | `get_trends` | `GET /x/trends` |
+| Search tweets | `search_tweets` | `GET /x/tweets/search` |
+| Read one tweet | `get_tweet` | `GET /x/tweets/{id}` |
+| Search X profiles | `search_users` | `GET /x/users/search` |
+| Read one profile | `get_user` | `GET /x/users/{id}` |
+| Read a profile timeline | `get_user_tweets` | `GET /x/users/{id}/tweets` |
+| Track regional trends | `get_trends` | `GET /x/trends` |
 
-This package exposes 6 read-only tasks.
-Use the [REST API](https://docs.xquik.com/api-reference/overview) for follower exports or writes.
+The package includes 6 read-only tasks for social media data pipelines. Use the
+[REST API](https://docs.xquik.com/api-reference/overview) for follower exports or publishing.
 
 ## Install
 
@@ -26,13 +25,13 @@ Use the [REST API](https://docs.xquik.com/api-reference/overview) for follower e
 pip install prefect-xquik
 ```
 
-## Register Blocks
+## Store X API credentials
 
 ```bash
 prefect block register -m prefect_xquik
 ```
 
-Create a block in the Prefect UI or with Python:
+Create a Prefect block in the UI or with Python:
 
 ```python
 from prefect_xquik import XquikCredentials
@@ -41,9 +40,9 @@ credentials = XquikCredentials(api_key="your_xquik_api_key_here")
 credentials.save("xquik", overwrite=True)
 ```
 
-Store API keys in Prefect blocks, not in flow source files.
+Keep API keys in Prefect blocks. Never put them in flow source files.
 
-## Create a Flow
+## Create a flow
 
 ```python
 from prefect import flow
@@ -51,7 +50,7 @@ from prefect_xquik import XquikCredentials, get_trends, search_tweets
 
 
 @flow
-async def social_signal_flow() -> dict:
+async def twitter_signal_flow() -> dict:
     credentials = XquikCredentials.load("xquik")
 
     tweets = await search_tweets(
@@ -65,7 +64,7 @@ async def social_signal_flow() -> dict:
     return {"tweets": tweets, "trends": trends}
 ```
 
-## Import Tasks
+## Import tasks
 
 ```python
 from prefect_xquik import (
@@ -78,22 +77,22 @@ from prefect_xquik import (
 )
 ```
 
-Tasks return the raw Xquik JSON response as a Python dictionary. Configure
-Prefect runtime behavior with `with_options`:
+Tasks return each raw Xquik JSON response as a Python dictionary. Set Prefect
+runtime options with `with_options`:
 
 ```python
 from prefect_xquik import search_tweets
 
 search_recent_tweets = search_tweets.with_options(
-    name="Search Recent X Posts",
+    name="Search recent tweets",
     retries=2,
     retry_delay_seconds=10,
 )
 ```
 
-## API Contract
+## API contract
 
-The credentials block sends `x-api-key` and `xquik-api-contract: 2026-04-29`.
+The credentials block sends `x-api-key` and `xquik-api-contract: 2026-04-29` headers.
 
 ## Documentation
 
@@ -105,7 +104,7 @@ The credentials block sends `x-api-key` and `xquik-api-contract: 2026-04-29`.
 - [Security policy](SECURITY.md)
 - [Contributing](CONTRIBUTING.md)
 
-## Development
+## Develop locally
 
 ```bash
 uv sync
@@ -117,8 +116,7 @@ uv run pytest
 uv run twine check dist/*
 ```
 
-`uv run pytest` enforces 100% statement, branch, function, and line coverage.
-CI also verifies REUSE 3.3 licensing and dependency audits.
-CI builds every distribution twice and compares each byte.
+`uv run pytest` requires 100% statement, branch, function, and line coverage.
+CI also checks REUSE 3.3 licensing, dependencies, and byte-for-byte builds.
 
 Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
