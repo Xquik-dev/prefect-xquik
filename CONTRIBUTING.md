@@ -1,4 +1,4 @@
-# Contributing
+# Contribute
 
 Run all commands from the repository root.
 
@@ -12,23 +12,20 @@ uv run pytest
 uv run twine check dist/*
 ```
 
-Before changing endpoint names, parameters, examples, or API contract headers,
-verify the behavior against the Xquik OpenAPI contract or public docs.
+Check endpoint names, parameters, examples, and contract headers against the
+Xquik OpenAPI schema or public documentation.
 
-Keep credentials in `XquikCredentials` blocks. Do not add API keys or other
-runtime secrets to examples, tests, docs, or issue text.
+Keep credentials in `XquikCredentials` blocks. Never add runtime secrets to
+examples, tests, documentation, or issues.
 
 ## Release
 
-PyPI publishing uses GitHub trusted publishing. Configure a PyPI pending
-publisher for:
+Configure this PyPI trusted publisher:
 
 - PyPI project: `prefect-xquik`
 - Owner: `Xquik-dev`
 - Repository: `prefect-xquik`
 - Workflow: `publish.yml`
 
-After the pending publisher is active, publish a GitHub release for a tag that
-matches the package version. The release workflow runs the same checks as CI,
-builds the wheel and sdist, verifies metadata, and publishes to PyPI without a
-stored PyPI token.
+Activate the publisher before creating a GitHub release. The tag must match the
+package version. The workflow checks, builds, and publishes without a stored token.

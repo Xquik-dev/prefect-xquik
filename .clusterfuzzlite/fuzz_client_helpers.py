@@ -22,8 +22,8 @@ class _Atheris(Protocol):
 
 atheris = cast(_Atheris, import_module("atheris"))
 
-# Load the client module without executing package imports for Prefect blocks.
-# Frozen modules live under _MEIPASS; source runs resolve from the repository.
+# Load the client without importing Prefect block dependencies.
+# Frozen modules use _MEIPASS. Source runs use the repository.
 bundle_root = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1]))
 package = ModuleType("prefect_xquik")
 package.__package__ = "prefect_xquik"

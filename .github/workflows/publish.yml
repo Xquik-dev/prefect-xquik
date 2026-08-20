@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Xquik Contributors
 # SPDX-License-Identifier: Apache-2.0
 
-name: Publish to PyPI
+name: Publish package to PyPI
 
 on:
   release:
@@ -56,18 +56,18 @@ jobs:
           release_tag = os.environ["RELEASE_TAG"]
           if release_tag != expected_tag:
               raise SystemExit(
-                  f"Release tag {release_tag!r} must match package tag {expected_tag!r}."
+                  f"Release tag {release_tag!r} does not match package tag {expected_tag!r}."
               )
           PY
           tag_commit=$(git rev-parse --verify "refs/tags/${RELEASE_TAG}^{commit}")
           head_commit=$(git rev-parse HEAD)
           main_commit=$(git rev-parse refs/remotes/origin/main)
           test "$tag_commit" = "$head_commit" || {
-            echo "Release tag must resolve to the checked-out commit."
+            echo "Release tag points elsewhere. Recreate it from this commit."
             exit 1
           }
           test "$tag_commit" = "$main_commit" || {
-            echo "Release tag must resolve to the default branch tip."
+            echo "Release tag is not on the main branch tip. Release from main."
             exit 1
           }
 
@@ -110,7 +110,7 @@ jobs:
       url: https://pypi.org/project/prefect-xquik/
     permissions:
       contents: read
-      id-token: write # Exchange the release identity for a short-lived PyPI token.
+      id-token: write # Request a short-lived PyPI token for this release.
 
     steps:
       - name: Download distributions
@@ -119,7 +119,7 @@ jobs:
           name: distributions
           path: dist
 
-      - name: Publish to PyPI
+      - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           attestations: true

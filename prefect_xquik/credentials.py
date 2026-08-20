@@ -15,27 +15,27 @@ from prefect_xquik.client import (
 
 
 class XquikCredentials(CredentialsBlock):
-    """Block used to authenticate Xquik API requests."""
+    """Store credentials for Xquik API requests."""
 
-    _block_type_name = "Xquik Credentials"
+    _block_type_name = "Xquik API Credentials"
     _documentation_url = "https://docs.xquik.com/guides/prefect"
     _logo_url = "https://xquik.com/icon.svg"
 
     api_key: SecretStr = Field(
         ...,
-        description="Xquik API key.",
+        description="API key for Xquik requests.",
     )
     base_url: str = Field(
         default=DEFAULT_BASE_URL,
-        description="Base URL for the Xquik API.",
+        description="Base URL for Xquik API requests.",
     )
     api_contract: str = Field(
         default=DEFAULT_API_CONTRACT,
-        description="Xquik API contract date sent with requests.",
+        description="API contract date sent with each Xquik request.",
     )
     timeout_seconds: float = Field(
         default=30.0,
-        description="Request timeout in seconds.",
+        description="Seconds to wait before a request times out.",
         gt=0,
     )
 
@@ -43,7 +43,7 @@ class XquikCredentials(CredentialsBlock):
     @classmethod
     def validate_api_key(cls, value: SecretStr) -> SecretStr:
         if not value.get_secret_value().strip():
-            raise ValueError("api_key must not be empty")
+            raise ValueError("api_key is empty. Add an Xquik API key.")
         return value
 
     @field_validator("base_url")
@@ -56,11 +56,11 @@ class XquikCredentials(CredentialsBlock):
     def validate_api_contract(cls, value: str) -> str:
         stripped = value.strip()
         if not stripped:
-            raise ValueError("api_contract must not be empty")
+            raise ValueError("api_contract is empty. Enter a contract date.")
         return stripped
 
     def get_client(self) -> XquikClient:
-        """Create an async Xquik client from this block."""
+        """Create an async Xquik API client from this block."""
 
         return XquikClient(
             api_key=self.api_key.get_secret_value(),

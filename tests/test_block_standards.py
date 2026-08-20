@@ -10,7 +10,7 @@ from prefect_xquik import XquikCredentials
 
 
 @pytest.mark.parametrize("block", [XquikCredentials])
-class TestAllBlocksAdhereToStandards(BlockStandardTestSuite):
+class TestXquikCredentialsBlock(BlockStandardTestSuite):
     @pytest.fixture
     def block(self, block: type[XquikCredentials]) -> type[XquikCredentials]:
         return block

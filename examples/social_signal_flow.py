@@ -9,7 +9,7 @@ from prefect_xquik import XquikCredentials, get_trends, search_tweets
 
 
 @flow
-async def social_signal_flow() -> dict[str, object]:
+async def twitter_signal_flow() -> dict[str, object]:
     credentials = XquikCredentials.load("xquik")
 
     tweets = await search_tweets(

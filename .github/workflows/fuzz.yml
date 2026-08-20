@@ -37,8 +37,8 @@ jobs:
           persist-credentials: false
 
       - name: Build fuzzers
-        # The action commit is immutable. Its upstream action.yml still selects
-        # Google's mutable :v1 runtime image, which this repository cannot pin.
+        # The action commit is immutable. Its action.yml selects Google's mutable
+        # :v1 runtime image, which this repository cannot pin.
         uses: google/clusterfuzzlite/actions/build_fuzzers@884713a6c30a92e5e8544c39945cd7cb630abcd1 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

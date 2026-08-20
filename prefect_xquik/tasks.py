@@ -22,7 +22,7 @@ async def search_tweets(
     since_time: str | None = None,
     until_time: str | None = None,
 ) -> dict[str, Any]:
-    """Search public tweets with optional pagination, ranking, and time bounds."""
+    """Run a Twitter search with pagination, ranking, and time filters."""
     return await credentials.get_client().search_tweets(
         query,
         cursor=cursor,
@@ -35,7 +35,7 @@ async def search_tweets(
 
 @task
 async def get_tweet(credentials: XquikCredentials, tweet_id: str) -> dict[str, Any]:
-    """Look up a tweet by ID."""
+    """Get a tweet by ID."""
     return await credentials.get_client().get_tweet(tweet_id)
 
 
@@ -46,13 +46,13 @@ async def search_users(
     *,
     cursor: str | None = None,
 ) -> dict[str, Any]:
-    """Search public users with optional pagination."""
+    """Search public X profiles with optional pagination."""
     return await credentials.get_client().search_users(query, cursor=cursor)
 
 
 @task
 async def get_user(credentials: XquikCredentials, user_id: str) -> dict[str, Any]:
-    """Look up a user by username or ID."""
+    """Get an X profile by username or user ID."""
     return await credentials.get_client().get_user(user_id)
 
 
@@ -65,7 +65,7 @@ async def get_user_tweets(
     include_parent_tweet: bool = False,
     include_replies: bool = False,
 ) -> dict[str, Any]:
-    """Fetch a user's tweets with optional reply and parent context."""
+    """Get one user's tweets with optional reply and parent context."""
     return await credentials.get_client().get_user_tweets(
         user_id,
         cursor=cursor,
@@ -81,5 +81,5 @@ async def get_trends(
     count: int = 30,
     woeid: int = 1,
 ) -> dict[str, Any]:
-    """Fetch trending topics for a location."""
+    """Get trending topics for a location."""
     return await credentials.get_client().get_trends(count=count, woeid=woeid)

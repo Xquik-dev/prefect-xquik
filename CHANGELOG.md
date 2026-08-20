@@ -2,50 +2,47 @@
 
 ## 0.1.9
 
-- Publish the reproducible Hatch build and complete license metadata.
-- Add continuous fuzzing and enforce 100% branch coverage.
-- Clarify common social-signal workflows and API contracts.
+- Publish reproducible Hatch distributions with complete license metadata.
+- Add continuous fuzzing and require 100% branch coverage.
+- Document social signal workflows and API contracts.
 
 ## 0.1.8
 
-- Refresh the Prefect dependency floor and supply-chain checks.
+- Update the minimum Prefect version and supply-chain checks.
 
 ## 0.1.7
 
-- Point the default API base URL at the public REST API host.
+- Use the public REST API host by default.
 
 ## 0.1.6
 
-- Add the public Xquik icon URL to the Prefect credentials block metadata for
-  collection registry display.
+- Add the Xquik icon to Prefect credentials block metadata.
 
 ## 0.1.5
 
-- Publish the collection on PyPI and switch install instructions to
-  `pip install prefect-xquik`.
-- Remove unsupported package classifier before PyPI publication.
+- Publish the collection on PyPI and use `pip install prefect-xquik`.
+- Remove an unsupported package classifier.
 
 ## 0.1.4
 
-- Improve README discoverability with badges, clearer title, navigation links,
-  use cases, and documentation links.
-- Expand package metadata keywords and project URLs.
+- Add README badges, use cases, navigation, and documentation links.
+- Add package keywords and project URLs.
 
 ## 0.1.3
 
-- Point package metadata, block docs, and README links at the Prefect guide.
+- Link package metadata, block docs, and the README to the Prefect guide.
 
 ## 0.1.2
 
-- Strengthen client and credentials validation.
-- Wrap invalid JSON and non-object API responses in `XquikError`.
-- Add package metadata checks and typed package marker.
-- Expand README usage guidance for Prefect users.
+- Validate client and credentials inputs.
+- Wrap invalid or unexpected JSON responses in `XquikError`.
+- Add package metadata checks and a typed package marker.
+- Add Prefect usage instructions to the README.
 
 ## 0.1.1
 
-- Replace premature PyPI install guidance with a pinned GitHub release wheel.
+- Replace PyPI instructions with a pinned GitHub release wheel.
 
 ## 0.1.0
 
-- Add initial Prefect collection with credentials block and read tasks.
+- Add the Prefect collection, credentials block, and read tasks.

@@ -57,7 +57,7 @@ def credentials(
 
 
 @pytest.mark.asyncio
-async def test_search_tweets_task(
+async def test_twitter_search_task_forwards_every_option(
     credentials: tuple[XquikCredentials, FakeXquikClient],
 ) -> None:
     block, fake_client = credentials
@@ -86,7 +86,7 @@ async def test_search_tweets_task(
 
 
 @pytest.mark.asyncio
-async def test_lookup_tasks(
+async def test_tweet_and_profile_tasks_forward_identifiers(
     credentials: tuple[XquikCredentials, FakeXquikClient],
 ) -> None:
     block, fake_client = credentials
@@ -106,7 +106,7 @@ async def test_lookup_tasks(
 
 
 @pytest.mark.asyncio
-async def test_user_tweets_and_trends_tasks(
+async def test_timeline_and_trend_tasks_forward_filters(
     credentials: tuple[XquikCredentials, FakeXquikClient],
 ) -> None:
     block, fake_client = credentials
