@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.10
+
+- Tighten package, task, and README descriptions.
+
 ## 0.1.9
 
 - Publish reproducible Hatch distributions with complete license metadata.

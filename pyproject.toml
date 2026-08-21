@@ -7,7 +7,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "prefect-xquik"
-version = "0.1.9"
+version = "0.1.10"
 description = "Prefect tasks for scheduled Twitter search, profiles, timelines, trends, and X API workflows. Not affiliated with X Corp."
 readme = "README.md"
 requires-python = ">=3.10"
