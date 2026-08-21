@@ -1,11 +1,10 @@
-# Schedule Twitter search, timelines & X API workflows with Prefect
+# Prefect tasks for Twitter search & X API workflows
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13728/badge)](https://www.bestpractices.dev/projects/13728)
 
-Run Twitter search, profile, timeline, and trend tasks in Prefect 3 flows. Store
-X API keys in Prefect blocks and use native async tasks and retries.
+Schedule 6 read-only Twitter search, profile, timeline, and trend tasks in Prefect 3. Store X API keys in Prefect blocks.
 
-## Pick a task
+## Tasks
 
 | Workflow step | Prefect task | Xquik endpoint |
 | --- | --- | --- |
@@ -14,10 +13,9 @@ X API keys in Prefect blocks and use native async tasks and retries.
 | Search X profiles | `search_users` | `GET /x/users/search` |
 | Read one profile | `get_user` | `GET /x/users/{id}` |
 | Read a profile timeline | `get_user_tweets` | `GET /x/users/{id}/tweets` |
-| Track regional trends | `get_trends` | `GET /x/trends` |
+| Read regional trends | `get_trends` | `GET /x/trends` |
 
-The package includes 6 read-only tasks for social media data pipelines. Use the
-[REST API](https://docs.xquik.com/api-reference/overview) for follower exports or publishing.
+Use the [REST API](https://docs.xquik.com/api-reference/overview) for follower exports or publishing.
 
 ## Install
 
@@ -77,8 +75,7 @@ from prefect_xquik import (
 )
 ```
 
-Tasks return each raw Xquik JSON response as a Python dictionary. Set Prefect
-runtime options with `with_options`:
+Tasks return raw Xquik JSON dictionaries and support Prefect's `with_options`:
 
 ```python
 from prefect_xquik import search_tweets
@@ -98,7 +95,6 @@ The credentials block sends `x-api-key` and `xquik-api-contract: 2026-04-29` hea
 
 - [Xquik Prefect guide](https://docs.xquik.com/guides/prefect)
 - [Xquik API reference](https://docs.xquik.com/api-reference/overview)
-- [Prefect integrations guide](https://docs.prefect.io/integrations/integrations)
 - [Prefect workflows and tasks](https://docs.prefect.io/v3/how-to-guides/workflows/write-and-run)
 - [Organization support policy](https://github.com/Xquik-dev/.github/blob/main/SUPPORT.md)
 - [Security policy](SECURITY.md)
@@ -116,7 +112,6 @@ uv run pytest
 uv run twine check dist/*
 ```
 
-`uv run pytest` requires 100% statement, branch, function, and line coverage.
-CI also checks REUSE 3.3 licensing, dependencies, and byte-for-byte builds.
+Pytest enforces 100% coverage. CI checks REUSE 3.3 metadata, dependencies, and byte-for-byte builds.
 
 Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.

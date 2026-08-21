@@ -235,7 +235,7 @@ async def test_invalid_response_explains_how_to_inspect_the_payload(
     ],
 )
 @pytest.mark.asyncio
-async def test_public_methods_return_actionable_validation_errors(
+async def test_public_methods_explain_invalid_values(
     method_name: str,
     args: tuple[str, ...],
     kwargs: dict[str, Any],
