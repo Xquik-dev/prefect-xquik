@@ -35,7 +35,7 @@ def test_pyproject_and_package_versions_match() -> None:
 def test_build_backend_and_package_path_are_fixed() -> None:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
 
-    assert pyproject["build-system"]["requires"] == ["hatchling==1.31.0"]
+    assert pyproject["build-system"]["requires"] == ["hatchling==1.32.0"]
     assert pyproject["build-system"]["build-backend"] == "hatchling.build"
     assert pyproject["tool"]["hatch"]["build"]["targets"]["wheel"]["packages"] == [
         "prefect_xquik"
