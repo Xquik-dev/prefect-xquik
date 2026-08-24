@@ -20,12 +20,6 @@ examples, tests, documentation, or issues.
 
 ## Release
 
-Configure this PyPI trusted publisher:
-
-- PyPI project: `prefect-xquik`
-- Owner: `Xquik-dev`
-- Repository: `prefect-xquik`
-- Workflow: `publish.yml`
-
-Activate the publisher before creating a GitHub release. The tag must match the
-package version. The workflow checks, builds, and publishes without a stored token.
+Configure PyPI trusted publishing for `Xquik-dev/prefect-xquik` through
+`publish.yml`. Activate it before releasing. Match the tag to the package
+version. The workflow checks, builds, and publishes without a stored token.

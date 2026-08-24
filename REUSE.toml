@@ -6,11 +6,8 @@ version = 1
 [[annotations]]
 path = [
   ".gitignore",
-  "CHANGELOG.md",
-  "CONTRIBUTING.md",
+  "*.md",
   "LICENSE",
-  "README.md",
-  "SECURITY.md",
   "prefect_xquik/py.typed",
   "uv.lock",
 ]
