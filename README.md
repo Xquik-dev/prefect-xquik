@@ -112,6 +112,6 @@ uv run pytest
 uv run twine check dist/*
 ```
 
-Pytest enforces 100% coverage. CI checks REUSE 3.3 metadata, dependencies, and byte-for-byte builds.
+Pytest enforces 100% coverage. `bin/check-local` checks REUSE 3.3 metadata, dependencies, and byte-for-byte builds.
 
 Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
