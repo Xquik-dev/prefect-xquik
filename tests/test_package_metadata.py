@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 try:
@@ -23,7 +22,6 @@ FULL_AFFILIATION_NOTICE = (
     '"Twitter" and "X" are trademarks of X Corp.'
 )
 COMPACT_AFFILIATION_NOTICE = "Not affiliated with X Corp."
-ACTION_REFERENCE = re.compile(r"[^@\s]+@[0-9a-f]{40}")
 
 
 def test_pyproject_and_package_versions_match() -> None:
@@ -57,39 +55,11 @@ def test_readme_and_package_metadata_have_affiliation_notices() -> None:
     assert COMPACT_AFFILIATION_NOTICE in pyproject["project"]["description"]
 
 
-def test_every_workflow_action_uses_an_immutable_commit() -> None:
-    for workflow_path in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
-        action_lines = [
-            line.strip()
-            for line in workflow_path.read_text().splitlines()
-            if line.strip().startswith("uses:")
-        ]
-        assert action_lines
-        for action_line in action_lines:
-            action = action_line.removeprefix("uses:").partition("#")[0].strip()
-            assert ACTION_REFERENCE.fullmatch(action), (
-                f"Workflow action is not pinned in {workflow_path}: {action}"
-            )
+def test_repository_has_no_github_actions_workflows() -> None:
+    assert not (ROOT / ".github" / "workflows").exists()
 
 
-def test_publish_workflow_requires_the_release_tag_on_main() -> None:
-    workflow = (ROOT / ".github" / "workflows" / "publish.yml").read_text()
-
-    assert "workflow_dispatch" not in workflow
-    assert "ref: ${{ github.event.release.tag_name }}" in workflow
-    assert "refs/tags/${RELEASE_TAG}^{commit}" in workflow
-    assert "refs/remotes/origin/main" in workflow
-    assert "main branch tip" in workflow
-    assert workflow.count("id-token: write") == 1
-    assert "attestations: true" in workflow
-
-
-def test_ci_and_releases_compare_repeated_builds() -> None:
-    for workflow_name in ("ci.yml", "publish.yml"):
-        workflow = (ROOT / ".github" / "workflows" / workflow_name).read_text()
-
-        assert "run: ./scripts/build_reproducibly.sh" in workflow
-
+def test_build_script_compares_repeated_builds() -> None:
     script = (ROOT / "scripts" / "build_reproducibly.sh").read_text()
     assert 'SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"' in script
     assert 'reproducible_dir="$(mktemp -d)"' in script
