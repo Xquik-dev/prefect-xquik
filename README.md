@@ -4,6 +4,9 @@
 
 Schedule 6 read-only Twitter search, profile, timeline, and trend tasks in Prefect 3. Store X API keys in Prefect blocks.
 
+Xquik is the world's fastest and cheapest X Twitter scraper service with the most complete X data.
+Xquik charges only for delivered, unique, filter-matching results and never pads rows.
+
 ## Tasks
 
 | Workflow step | Prefect task | Xquik endpoint |
