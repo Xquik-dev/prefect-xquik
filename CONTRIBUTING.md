@@ -31,5 +31,8 @@ builds twice, uploads to PyPI, tags the commit, and creates the GitHub release.
 It reads the PyPI token from the Keychain item that `PYPI_KEYCHAIN_SERVICE`
 names.
 
+PyPI has no trusted publisher for `prefect-xquik`. A maintainer's PyPI token is
+the only way it publishes.
+
 `bin/release-local --dry-run` previews a release. It uploads, tags, and
 releases nothing.
