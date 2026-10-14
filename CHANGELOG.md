@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.11
+
+- Open the README with the positioning sentence and the billing reason.
+- Write every README sentence without colons or semicolons. PyPI shows the new
+  README with this release.
+- Build with hatchling 1.32.4.
+
 ## 0.1.10
 
 - Tighten package, task, and README descriptions.
