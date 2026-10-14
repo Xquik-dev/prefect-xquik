@@ -12,8 +12,6 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 BASH = shutil.which("bash") or "/bin/bash"
-# The stub scripts record their run and fail when CHECK_CASE names it.
-# The CodeQL stub also answers --version.
 SCRIPT = r"""#!/usr/bin/env bash
 name=$(basename "$0")
 if [ "${1:-}" = --version ]; then
@@ -26,7 +24,6 @@ printf '%s\n' "$event" >> "$CHECK_EVENTS"
 [ "$CHECK_CASE$name" != changedcodeql-security ] || touch "$CHECK_DIRTY"
 [ "$CHECK_CASE" != "$event" ]
 """
-# The stubs record each check as an event and fail the one CHECK_CASE names.
 STUB = r"""record() {
  printf '%s\n' "$1" >> "$CHECK_EVENTS"
  [ "$CHECK_CASE" != "$1" ]
@@ -74,7 +71,6 @@ runner=$1; shift
 bash "$runner" "$@"
 """
 STEPS = ["sync", "format", "lint", "audit", "test", "build_reproducibly.sh", "metadata"]
-# check-local runs these tests with both set, so the stubs start without them.
 UV = ("UV_PYTHON", "UV_PROJECT_ENVIRONMENT")
 VERSIONS = ["3.10", "3.11", "3.12", "3.13"]
 CHECKS = [

@@ -12,8 +12,6 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 BASH = shutil.which("bash") or "/bin/bash"
-# The stubs record each release step as an event.
-# RELEASE_CASE picks the state they report.
 STUB = r"""record() { printf '%s\n' "$1" >> "$RELEASE_EVENTS"; }
 git() {
  case "$1" in
@@ -92,7 +90,6 @@ DRY_RUN_END = (
     "Dry run finished for prefect-xquik 1.2.3. "
     "Nothing was uploaded, tagged, or released."
 )
-# The build stub writes 1 wheel and 1 source archive into the folder it is given.
 BUILD = r"""#!/usr/bin/env bash
 printf 'build\n' >> "$RELEASE_EVENTS"
 mkdir -p "$1"

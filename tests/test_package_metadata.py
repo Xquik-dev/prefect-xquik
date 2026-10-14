@@ -7,7 +7,7 @@ from pathlib import Path
 
 try:
     import tomllib
-except ModuleNotFoundError:  # pragma: no cover
+except ModuleNotFoundError:
     import tomli as tomllib
 
 from prefect_xquik import __version__
