@@ -1,8 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Xquik Contributors
 # SPDX-License-Identifier: Apache-2.0
 
-"""Fail unless a SARIF report shows 1 complete CodeQL run with no findings."""
-
 from __future__ import annotations
 
 import json
@@ -34,7 +32,6 @@ def _describe(finding: dict[str, Any]) -> str:
 
 
 def validate(report: Any) -> str:
-    """Return a summary of a clean report, or raise with the reason it is not clean."""
     runs = _items(report.get("runs") if isinstance(report, dict) else None, "runs")
     if report.get("version") != "2.1.0" or len(runs) != 1:
         message = "Expected 1 SARIF 2.1.0 run."
