@@ -32,7 +32,7 @@ pip install prefect-xquik
 prefect block register -m prefect_xquik
 ```
 
-Create a Prefect block in the UI or with Python:
+Create a Prefect block in the UI or with Python.
 
 ```python
 from prefect_xquik import XquikCredentials
@@ -78,7 +78,7 @@ from prefect_xquik import (
 )
 ```
 
-Tasks return raw Xquik JSON dictionaries and support Prefect's `with_options`:
+Tasks return raw Xquik JSON dictionaries and support Prefect's `with_options`.
 
 ```python
 from prefect_xquik import search_tweets
