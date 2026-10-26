@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-import sys
+import tomllib
 from pathlib import Path
 
 from pydantic import JsonValue, TypeAdapter
@@ -11,11 +11,6 @@ from pydantic import JsonValue, TypeAdapter
 from prefect_xquik import __version__
 from prefect_xquik.client import USER_AGENT
 from prefect_xquik.credentials import XquikCredentials
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 TOML_VALUE: TypeAdapter[JsonValue] = TypeAdapter(JsonValue)

@@ -59,7 +59,7 @@ trap on_exit EXIT
 
 if [[ -n "$status_commit" ]]; then
   echo "==> Posting a pending $status_context status to ${status_commit:0:12}."
-  post_status pending "Running licensing, lint, types, audit, tests, build & CodeQL on 4 Python versions."
+  post_status pending "Running licensing, lint, types, audit, tests, build & CodeQL on 3 Python versions."
 fi
 
 current_check="CodeQL CLI"
@@ -112,7 +112,7 @@ run_check "REUSE" "Licensing with REUSE lint" \
   uv tool run --from "reuse==$reuse_version" reuse lint
 run_check "" "Type checker comments" \
   "Remove the comments listed above and fix the type errors they hide." no_ignore_comments
-for python_version in 3.10 3.11 3.12 3.13; do
+for python_version in 3.11 3.12 3.13; do
   run_check "" "Install locked dependencies on Python $python_version" \
     "Install uv and check network access, or update uv.lock, then rerun." \
     on_python "$python_version" uv sync --locked --dev

@@ -13,7 +13,7 @@ uv run pytest
 uv run twine check dist/*
 ```
 
-`bin/check-local` runs these checks on Python 3.10 to 3.13, then REUSE lint and
+`bin/check-local` runs these checks on Python 3.11 to 3.13, then REUSE lint and
 CodeQL. Run it before you open a pull request.
 
 Check endpoint names, parameters, examples, and contract headers against the

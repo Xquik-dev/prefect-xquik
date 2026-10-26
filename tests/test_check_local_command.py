@@ -91,7 +91,7 @@ STEPS = [
     "metadata",
 ]
 UV = ("UV_PYTHON", "UV_PROJECT_ENVIRONMENT")
-VERSIONS = ["3.10", "3.11", "3.12", "3.13"]
+VERSIONS = ["3.11", "3.12", "3.13"]
 CHECKS = [
     "reuse",
     "ignores",
@@ -100,10 +100,10 @@ CHECKS = [
 ]
 PENDING = (
     "pending: Running licensing, lint, types, audit, tests, build & CodeQL "
-    "on 4 Python versions."
+    "on 3 Python versions."
 )
 PASSED = (
-    "REUSE, format, lint, types, audit, tests (184 passed in 4 runs), "
+    "REUSE, format, lint, types, audit, tests (138 passed in 3 runs), "
     "reproducible build & metadata, CodeQL 2.27.2."
 )
 
@@ -177,25 +177,25 @@ def test_type_checker_comments_fail_the_build(tmp_path: Path, comment: str) -> N
     ("case", "ran", "failed"),
     [
         ("reuse", 1, "Licensing with REUSE lint"),
-        ("sync 3.10", 3, "Install locked dependencies on Python 3.10"),
-        ("format 3.10", 4, "Format check on Python 3.10"),
-        ("types 3.10", 6, "Type check on Python 3.10"),
-        ("lint 3.11", 13, "Lint on Python 3.11"),
-        ("any 3.12", 22, "Type check on Python 3.12"),
-        ("audit 3.12", 23, "Dependency audit on Python 3.12"),
-        ("test 3.13", 32, "Tests on Python 3.13"),
+        ("sync 3.11", 3, "Install locked dependencies on Python 3.11"),
+        ("format 3.11", 4, "Format check on Python 3.11"),
+        ("types 3.11", 6, "Type check on Python 3.11"),
+        ("lint 3.12", 13, "Lint on Python 3.12"),
+        ("any 3.12", 14, "Type check on Python 3.12"),
+        ("audit 3.13", 23, "Dependency audit on Python 3.13"),
+        ("test 3.13", 24, "Tests on Python 3.13"),
         (
             "build_reproducibly.sh 3.13",
-            33,
+            25,
             "Reproducible build and metadata on Python 3.13",
         ),
-        ("metadata 3.13", 34, "Reproducible build and metadata on Python 3.13"),
+        ("metadata 3.13", 26, "Reproducible build and metadata on Python 3.13"),
         (
             "codeql-security",
-            35,
+            27,
             "Static analysis with CodeQL 2.27.2 security-extended queries",
         ),
-        ("changed", 35, "Final tree check"),
+        ("changed", 27, "Final tree check"),
     ],
 )
 def test_failed_check_posts_failure_and_stops(
