@@ -44,3 +44,11 @@ def test_credentials_explain_how_to_fix_an_invalid_base_url() -> None:
 def test_credentials_explain_how_to_fix_an_empty_contract() -> None:
     with pytest.raises(ValidationError, match="api_contract is empty"):
         XquikCredentials(api_key=SecretStr("secret-key"), api_contract=" ")
+
+
+def test_credentials_accept_the_api_key_as_text() -> None:
+    data: dict[str, str] = {"api_key": "secret-key"}
+
+    credentials = XquikCredentials.model_validate(data)
+
+    assert credentials.api_key.get_secret_value() == "secret-key"

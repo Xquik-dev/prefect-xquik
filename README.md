@@ -156,6 +156,6 @@ uv run pytest
 uv run twine check dist/*
 ```
 
-Pytest enforces 100% coverage. mypy checks every Python file in strict mode, and `bin/check-local` rejects any expression of type `Any` and any type ignore comment. `bin/check-local` checks REUSE 3.3 metadata, dependencies, and byte-for-byte builds.
+Pytest enforces 100% coverage. mypy checks every Python file in strict mode, and `bin/check-local` fails on any expression of type `Any` and on any type checker comment. `bin/check-local` checks REUSE 3.3 metadata, dependencies, and byte-for-byte builds.
 
 Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.

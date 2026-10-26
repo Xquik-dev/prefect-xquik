@@ -35,7 +35,7 @@ def _parse(text: str) -> object:
     decoded: tuple[object, int] = json.JSONDecoder().raw_decode(document)
     value, end = decoded
     if end != len(document):
-        message = "CodeQL report holds more than 1 JSON value."
+        message = "CodeQL report has text after its JSON value."
         raise ValueError(message)
     return value
 

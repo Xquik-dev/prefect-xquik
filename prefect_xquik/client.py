@@ -3,11 +3,12 @@
 
 from __future__ import annotations
 
+import json
+from collections.abc import Callable
 from typing import Literal, TypeAlias
 from urllib.parse import quote, urlparse
 
 import httpx
-from pydantic import JsonValue, TypeAdapter, ValidationError
 
 from prefect_xquik._version import __version__
 
@@ -17,9 +18,12 @@ USER_AGENT = f"prefect-xquik/{__version__}"
 
 QueryType = Literal["Latest", "Top"]
 _QUERY_TYPES: dict[str, QueryType] = {"Latest": "Latest", "Top": "Top"}
+JsonValue: TypeAlias = (
+    str | int | float | bool | list["JsonValue"] | dict[str, "JsonValue"] | None
+)
 JsonObject: TypeAlias = dict[str, JsonValue]
 
-_JSON_VALUE: TypeAdapter[JsonValue] = TypeAdapter(JsonValue)
+_decode_json: Callable[[bytes], JsonValue] = json.loads
 
 
 class XquikError(RuntimeError):
@@ -174,8 +178,8 @@ class XquikClient:
             raise XquikError(f"Xquik API request failed: {exc}") from exc
 
         try:
-            payload = _JSON_VALUE.validate_json(response.content)
-        except ValidationError as exc:
+            payload = _decode_json(response.content)
+        except json.JSONDecodeError as exc:
             raise XquikError(
                 "Xquik returned invalid JSON. Retry or inspect response_text.",
                 response_text=response.text,

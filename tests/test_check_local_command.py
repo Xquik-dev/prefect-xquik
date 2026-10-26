@@ -12,6 +12,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 BASH = shutil.which("bash") or "/bin/bash"
+GIT = shutil.which("git") or "/usr/bin/git"
 SCRIPT = r"""#!/usr/bin/env bash
 name=$(basename "$0")
 if [ "${1:-}" = --version ]; then
@@ -35,8 +36,7 @@ git() {
   'status --porcelain') if dirty; then echo ' M README.md'; fi;;
   'grep -nP')
    printf '%s\n' ignores >> "$CHECK_EVENTS"
-   [ "$CHECK_CASE" = ignores ] || return 1
-   echo a.py:1:x;;
+   command git "$@";;
   *) exit 99;;
  esac
 }
@@ -109,11 +109,14 @@ PASSED = (
 
 
 def run_checks(
-    tmp_path: Path, case: str, *arguments: str
+    tmp_path: Path, case: str, *arguments: str, source: str = ""
 ) -> tuple[int, list[str], list[str], list[str]]:
     project = tmp_path / "project"
     for folder in ("bin", "scripts"):
         (project / folder).mkdir(parents=True)
+    subprocess.run([GIT, "init", "-q", str(project)], check=True)
+    if source:
+        (project / "probe.py").write_text(source)
     runner = project / "bin/check-local"
     runner.write_bytes((ROOT / "bin/check-local").read_bytes())
     for name in ("codeql-security", "build_reproducibly.sh"):
@@ -156,7 +159,6 @@ def test_success_status_lists_the_checks_that_passed(tmp_path: Path) -> None:
     ("case", "ran", "failed"),
     [
         ("reuse", 1, "Licensing with REUSE lint"),
-        ("ignores", 2, "Type ignore comments"),
         ("sync 3.10", 3, "Install locked dependencies on Python 3.10"),
         ("format 3.10", 4, "Format check on Python 3.10"),
         ("types 3.10", 6, "Type check on Python 3.10"),
@@ -178,6 +180,24 @@ def test_success_status_lists_the_checks_that_passed(tmp_path: Path) -> None:
         ("changed", 35, "Final tree check"),
     ],
 )
+@pytest.mark.parametrize(
+    "comment",
+    [
+        "type: ignore[assignment]",
+        "pyright: ignore[reportAssignmentType]",
+        "mypy: ignore-errors",
+        "pyright: basic",
+    ],
+)
+def test_type_checker_comments_fail_the_build(tmp_path: Path, comment: str) -> None:
+    line = f'x: int = "a"  # {comment}'
+    status, events, statuses, output = run_checks(tmp_path, "ready", source=f"{line}\n")
+    assert status == 1
+    assert events == CHECKS[:2]
+    assert statuses == [PENDING, "failure: Failed at Type checker comments."]
+    assert f"probe.py:1:{line}" in output
+
+
 def test_failed_check_posts_failure_and_stops(
     tmp_path: Path, case: str, ran: int, failed: str
 ) -> None:

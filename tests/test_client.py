@@ -8,10 +8,14 @@ from contextlib import asynccontextmanager
 
 import httpx
 import pytest
-from pydantic import JsonValue
 
 from prefect_xquik import XquikClient, XquikError, __version__
-from prefect_xquik.client import DEFAULT_BASE_URL, JsonObject, _require_query_type
+from prefect_xquik.client import (
+    DEFAULT_BASE_URL,
+    JsonObject,
+    JsonValue,
+    _require_query_type,
+)
 
 Handler = Callable[[httpx.Request], httpx.Response]
 InvalidCall = Callable[[XquikClient], Awaitable[JsonObject]]
