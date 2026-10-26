@@ -9,3 +9,4 @@ build/
 htmlcov/
 .DS_Store
 .claude/worktrees/
+.mypy_cache/

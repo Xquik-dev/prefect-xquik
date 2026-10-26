@@ -3,21 +3,26 @@
 
 from __future__ import annotations
 
+from collections.abc import Awaitable
+
 from prefect import flow
 
 from prefect_xquik import XquikCredentials, get_trends, search_tweets
 
 
-@flow
+@flow()
 async def twitter_signal_flow() -> dict[str, object]:
-    credentials = XquikCredentials.load("xquik")
+    loading: Awaitable[XquikCredentials] = XquikCredentials.aload("xquik")
+    credentials = await loading
 
-    tweets = await search_tweets(
+    searching: Awaitable[object] = search_tweets(
         credentials,
         query='"prefect" OR "workflow orchestration"',
         query_type="Latest",
         limit=25,
     )
-    trends = await get_trends(credentials, woeid=1, count=10)
+    tweets = await searching
+    trending: Awaitable[object] = get_trends(credentials, woeid=1, count=10)
+    trends = await trending
 
     return {"tweets": tweets, "trends": trends}

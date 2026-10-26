@@ -3,15 +3,13 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from prefect import task
 
-from prefect_xquik.client import QueryType
+from prefect_xquik.client import JsonObject, QueryType
 from prefect_xquik.credentials import XquikCredentials
 
 
-@task
+@task()
 async def search_tweets(
     credentials: XquikCredentials,
     query: str,
@@ -21,7 +19,7 @@ async def search_tweets(
     query_type: QueryType = "Latest",
     since_time: str | None = None,
     until_time: str | None = None,
-) -> dict[str, Any]:
+) -> JsonObject:
     """Run a Twitter search with pagination, ranking, and time filters."""
     return await credentials.get_client().search_tweets(
         query,
@@ -33,30 +31,30 @@ async def search_tweets(
     )
 
 
-@task
-async def get_tweet(credentials: XquikCredentials, tweet_id: str) -> dict[str, Any]:
+@task()
+async def get_tweet(credentials: XquikCredentials, tweet_id: str) -> JsonObject:
     """Get a tweet by ID."""
     return await credentials.get_client().get_tweet(tweet_id)
 
 
-@task
+@task()
 async def search_users(
     credentials: XquikCredentials,
     query: str,
     *,
     cursor: str | None = None,
-) -> dict[str, Any]:
+) -> JsonObject:
     """Search public X profiles with optional pagination."""
     return await credentials.get_client().search_users(query, cursor=cursor)
 
 
-@task
-async def get_user(credentials: XquikCredentials, user_id: str) -> dict[str, Any]:
+@task()
+async def get_user(credentials: XquikCredentials, user_id: str) -> JsonObject:
     """Get an X profile by username or user ID."""
     return await credentials.get_client().get_user(user_id)
 
 
-@task
+@task()
 async def get_user_tweets(
     credentials: XquikCredentials,
     user_id: str,
@@ -64,7 +62,7 @@ async def get_user_tweets(
     cursor: str | None = None,
     include_parent_tweet: bool = False,
     include_replies: bool = False,
-) -> dict[str, Any]:
+) -> JsonObject:
     """Get one user's tweets with optional reply and parent context."""
     return await credentials.get_client().get_user_tweets(
         user_id,
@@ -74,12 +72,12 @@ async def get_user_tweets(
     )
 
 
-@task
+@task()
 async def get_trends(
     credentials: XquikCredentials,
     *,
     count: int = 30,
     woeid: int = 1,
-) -> dict[str, Any]:
+) -> JsonObject:
     """Get trending topics for a location."""
     return await credentials.get_client().get_trends(count=count, woeid=woeid)

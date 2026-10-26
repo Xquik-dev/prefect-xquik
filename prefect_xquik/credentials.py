@@ -3,8 +3,11 @@
 
 from __future__ import annotations
 
+from typing import Annotated, ClassVar
+
 from prefect.blocks.abstract import CredentialsBlock
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, HttpUrl, SecretStr, field_validator
+from typing_extensions import override
 
 from prefect_xquik.client import (
     DEFAULT_API_CONTRACT,
@@ -17,14 +20,13 @@ from prefect_xquik.client import (
 class XquikCredentials(CredentialsBlock):
     """Store credentials for Xquik API requests."""
 
-    _block_type_name = "Xquik API Credentials"
-    _documentation_url = "https://docs.xquik.com/guides/prefect"
-    _logo_url = "https://xquik.com/icon.svg"
-
-    api_key: SecretStr = Field(
-        ...,
-        description="API key for Xquik requests.",
+    _block_type_name: ClassVar[str | None] = "Xquik API Credentials"
+    _documentation_url: ClassVar[HttpUrl | None] = HttpUrl(
+        "https://docs.xquik.com/guides/prefect"
     )
+    _logo_url: ClassVar[HttpUrl | None] = HttpUrl("https://xquik.com/icon.svg")
+
+    api_key: Annotated[SecretStr, Field(description="API key for Xquik requests.")]
     base_url: str = Field(
         default=DEFAULT_BASE_URL,
         description="Base URL for Xquik API requests.",
@@ -59,6 +61,7 @@ class XquikCredentials(CredentialsBlock):
             raise ValueError("api_contract is empty. Enter a contract date.")
         return stripped
 
+    @override
     def get_client(self) -> XquikClient:
         """Create an async Xquik API client from this block."""
 

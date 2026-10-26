@@ -5,15 +5,16 @@ Run all commands from the repository root.
 ```bash
 uv sync
 uv run ruff format --check .
-uv run ruff check .
+uv run ruff check --ignore-noqa .
+uv run mypy
 uv run pip-audit
 uv run pytest
 ./scripts/build_reproducibly.sh
 uv run twine check dist/*
 ```
 
-`bin/check-local` runs these checks on Python 3.10 to 3.13, then REUSE lint and
-CodeQL. Run it before you open a pull request.
+`bin/check-local` runs REUSE lint and the type checker comment check, then these
+checks on Python 3.11 to 3.13, then CodeQL. Run it before you open a pull request.
 
 Check endpoint names, parameters, examples, and contract headers against the
 Xquik OpenAPI schema or public documentation.

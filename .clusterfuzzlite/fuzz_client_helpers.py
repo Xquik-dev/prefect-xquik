@@ -4,25 +4,16 @@
 from __future__ import annotations
 
 import sys
-from collections.abc import Callable, Sequence
-from contextlib import AbstractContextManager, suppress
-from importlib import import_module
+from contextlib import suppress
 from pathlib import Path
 from types import ModuleType
-from typing import NoReturn, Protocol, cast
 
+import atheris
 
-class _Atheris(Protocol):
-    def instrument_imports(self) -> AbstractContextManager[None]: ...
-
-    def Setup(self, argv: Sequence[str], callback: Callable[[bytes], None]) -> None: ...
-
-    def Fuzz(self) -> NoReturn: ...
-
-
-atheris = cast(_Atheris, import_module("atheris"))
-
-bundle_root = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1]))
+meipass: object = getattr(sys, "_MEIPASS", None)
+bundle_root = (
+    Path(meipass) if isinstance(meipass, str) else Path(__file__).resolve().parents[1]
+)
 package = ModuleType("prefect_xquik")
 package.__package__ = "prefect_xquik"
 package.__path__ = [str(bundle_root / "prefect_xquik")]
