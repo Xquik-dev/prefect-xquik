@@ -148,13 +148,14 @@ The credentials block sends `x-api-key` and `xquik-api-contract: 2026-04-29` hea
 ```bash
 uv sync
 uv run ruff format --check .
-uv run ruff check .
+uv run ruff check --ignore-noqa .
+uv run mypy
 uv run pip-audit
 uv run pytest
 ./scripts/build_reproducibly.sh
 uv run twine check dist/*
 ```
 
-Pytest enforces 100% coverage. `bin/check-local` checks REUSE 3.3 metadata, dependencies, and byte-for-byte builds.
+Pytest enforces 100% coverage. mypy checks every Python file in strict mode, and `bin/check-local` rejects any expression of type `Any` and any type ignore comment. `bin/check-local` checks REUSE 3.3 metadata, dependencies, and byte-for-byte builds.
 
 Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.

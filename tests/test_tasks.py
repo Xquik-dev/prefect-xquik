@@ -3,9 +3,8 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 import pytest
+from pydantic import SecretStr
 
 from prefect_xquik import (
     XquikCredentials,
@@ -20,40 +19,46 @@ from prefect_xquik import (
 
 class FakeXquikClient:
     def __init__(self) -> None:
-        self.calls: list[tuple[str, tuple[Any, ...], dict[str, Any]]] = []
+        self.calls: list[tuple[str, tuple[object, ...], dict[str, object]]] = []
 
-    async def search_tweets(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    async def search_tweets(self, *args: object, **kwargs: object) -> dict[str, object]:
         self.calls.append(("search_tweets", args, kwargs))
         return {"tweets": []}
 
-    async def get_tweet(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    async def get_tweet(self, *args: object, **kwargs: object) -> dict[str, object]:
         self.calls.append(("get_tweet", args, kwargs))
         return {"tweet": {"id": args[0]}}
 
-    async def search_users(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    async def search_users(self, *args: object, **kwargs: object) -> dict[str, object]:
         self.calls.append(("search_users", args, kwargs))
         return {"users": []}
 
-    async def get_user(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    async def get_user(self, *args: object, **kwargs: object) -> dict[str, object]:
         self.calls.append(("get_user", args, kwargs))
         return {"user": {"id": args[0]}}
 
-    async def get_user_tweets(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    async def get_user_tweets(
+        self, *args: object, **kwargs: object
+    ) -> dict[str, object]:
         self.calls.append(("get_user_tweets", args, kwargs))
         return {"tweets": []}
 
-    async def get_trends(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    async def get_trends(self, *args: object, **kwargs: object) -> dict[str, object]:
         self.calls.append(("get_trends", args, kwargs))
         return {"trends": []}
 
 
-@pytest.fixture
+@pytest.fixture()
 def credentials(
     monkeypatch: pytest.MonkeyPatch,
 ) -> tuple[XquikCredentials, FakeXquikClient]:
     fake_client = FakeXquikClient()
-    monkeypatch.setattr(XquikCredentials, "get_client", lambda self: fake_client)
-    return XquikCredentials(api_key="secret-key"), fake_client
+
+    def get_fake_client(self: XquikCredentials) -> FakeXquikClient:
+        return fake_client
+
+    monkeypatch.setattr(XquikCredentials, "get_client", get_fake_client)
+    return XquikCredentials(api_key=SecretStr("secret-key")), fake_client
 
 
 @pytest.mark.asyncio

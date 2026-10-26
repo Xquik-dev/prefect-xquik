@@ -33,6 +33,10 @@ git() {
  case "$1 $2" in
   'rev-parse HEAD') echo abc123;;
   'status --porcelain') if dirty; then echo ' M README.md'; fi;;
+  'grep -nP')
+   printf '%s\n' ignores >> "$CHECK_EVENTS"
+   [ "$CHECK_CASE" = ignores ] || return 1
+   echo a.py:1:x;;
   *) exit 99;;
  esac
 }
@@ -57,7 +61,13 @@ uv() {
  case "$*" in
   'sync --locked --dev') record "sync $UV_PYTHON";;
   'run --no-sync ruff format --check .') record "format $UV_PYTHON";;
-  'run --no-sync ruff check .') record "lint $UV_PYTHON";;
+  'run --no-sync ruff check --ignore-noqa .') record "lint $UV_PYTHON";;
+  'run --no-sync mypy --any-exprs-report '*)
+   mkdir -p "$5"
+   anys=0
+   [ "$CHECK_CASE" != "any $UV_PYTHON" ] || anys=1
+   printf 'Total %s 10 90.00%%\n' "$anys" > "$5/any-exprs.txt"
+   record "types $UV_PYTHON";;
   'run --no-sync pip-audit') record "audit $UV_PYTHON";;
   'run --no-sync pytest')
    echo "===== 46 passed in 1.00s ====="
@@ -70,20 +80,30 @@ export -f record dirty git gh uv
 runner=$1; shift
 bash "$runner" "$@"
 """
-STEPS = ["sync", "format", "lint", "audit", "test", "build_reproducibly.sh", "metadata"]
+STEPS = [
+    "sync",
+    "format",
+    "lint",
+    "types",
+    "audit",
+    "test",
+    "build_reproducibly.sh",
+    "metadata",
+]
 UV = ("UV_PYTHON", "UV_PROJECT_ENVIRONMENT")
 VERSIONS = ["3.10", "3.11", "3.12", "3.13"]
 CHECKS = [
     "reuse",
+    "ignores",
     *[f"{step} {version}" for version in VERSIONS for step in STEPS],
     "codeql-security",
 ]
 PENDING = (
-    "pending: Running licensing, lint, audit, tests, build & CodeQL "
+    "pending: Running licensing, lint, types, audit, tests, build & CodeQL "
     "on 4 Python versions."
 )
 PASSED = (
-    "REUSE, format, lint, audit, tests (184 passed in 4 runs), "
+    "REUSE, format, lint, types, audit, tests (184 passed in 4 runs), "
     "reproducible build & metadata, CodeQL 2.27.2."
 )
 
@@ -136,23 +156,26 @@ def test_success_status_lists_the_checks_that_passed(tmp_path: Path) -> None:
     ("case", "ran", "failed"),
     [
         ("reuse", 1, "Licensing with REUSE lint"),
-        ("sync 3.10", 2, "Install locked dependencies on Python 3.10"),
-        ("format 3.10", 3, "Format check on Python 3.10"),
-        ("lint 3.11", 11, "Lint on Python 3.11"),
-        ("audit 3.12", 19, "Dependency audit on Python 3.12"),
-        ("test 3.13", 27, "Tests on Python 3.13"),
+        ("ignores", 2, "Type ignore comments"),
+        ("sync 3.10", 3, "Install locked dependencies on Python 3.10"),
+        ("format 3.10", 4, "Format check on Python 3.10"),
+        ("types 3.10", 6, "Type check on Python 3.10"),
+        ("lint 3.11", 13, "Lint on Python 3.11"),
+        ("any 3.12", 22, "Type check on Python 3.12"),
+        ("audit 3.12", 23, "Dependency audit on Python 3.12"),
+        ("test 3.13", 32, "Tests on Python 3.13"),
         (
             "build_reproducibly.sh 3.13",
-            28,
+            33,
             "Reproducible build and metadata on Python 3.13",
         ),
-        ("metadata 3.13", 29, "Reproducible build and metadata on Python 3.13"),
+        ("metadata 3.13", 34, "Reproducible build and metadata on Python 3.13"),
         (
             "codeql-security",
-            30,
+            35,
             "Static analysis with CodeQL 2.27.2 security-extended queries",
         ),
-        ("changed", 30, "Final tree check"),
+        ("changed", 35, "Final tree check"),
     ],
 )
 def test_failed_check_posts_failure_and_stops(

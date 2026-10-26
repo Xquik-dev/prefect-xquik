@@ -5,7 +5,8 @@ Run all commands from the repository root.
 ```bash
 uv sync
 uv run ruff format --check .
-uv run ruff check .
+uv run ruff check --ignore-noqa .
+uv run mypy
 uv run pip-audit
 uv run pytest
 ./scripts/build_reproducibly.sh

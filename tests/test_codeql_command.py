@@ -9,7 +9,6 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -23,7 +22,7 @@ MISSING = (
     "CodeQL CLI is missing. Install it with brew install --cask codeql, then rerun."
 )
 OUTDATED = "CodeQL CLI 2.26.9 is older than 2.27.0. Run brew upgrade --cask codeql."
-EXTRACTED = {
+EXTRACTED: dict[str, object] = {
     "descriptor": {"id": "py/diagnostics/successfully-extracted-files"},
     "level": "none",
 }
@@ -71,25 +70,28 @@ def test_unusable_codeql_fails_with_the_next_step(
     assert result.stdout == ""
 
 
-def invocation(successful: bool, notification: dict[str, Any]) -> dict[str, Any]:
+def invocation(successful: bool, notification: dict[str, object]) -> dict[str, object]:
     return {
         "executionSuccessful": successful,
         "toolExecutionNotifications": [notification],
     }
 
 
-def report(**change: Any) -> dict[str, Any]:
-    run = {
+def run(**change: object) -> dict[str, object]:
+    return {
         "invocations": [invocation(True, EXTRACTED)],
         "results": [],
         **change,
     }
-    return {"runs": [run], "version": "2.1.0"}
 
 
-def finding(level: str | None) -> dict[str, Any]:
+def report(**change: object) -> dict[str, object]:
+    return {"runs": [run(**change)], "version": "2.1.0"}
+
+
+def finding(level: str | None) -> dict[str, object]:
     location = {"artifactLocation": {"uri": "src/a.py"}, "region": {"startLine": 7}}
-    result = {
+    result: dict[str, object] = {
         "locations": [{"physicalLocation": location}],
         "message": {"text": "Unsafe value."},
         "ruleId": "py/x",
@@ -97,7 +99,7 @@ def finding(level: str | None) -> dict[str, Any]:
     return result if level is None else {**result, "level": level}
 
 
-def verify(tmp_path: Path, sarif: Any) -> subprocess.CompletedProcess[str]:
+def verify(tmp_path: Path, sarif: object) -> subprocess.CompletedProcess[str]:
     path = tmp_path / "report.sarif"
     path.write_text(json.dumps(sarif))
     return subprocess.run(
@@ -132,10 +134,10 @@ def test_finding_of_any_level_fails_and_names_its_place(
     [
         ({"runs": [], "version": "2.1.0"}, "CodeQL report lacks runs."),
         (
-            {"runs": report()["runs"] * 2, "version": "2.1.0"},
+            {"runs": [run(), run()], "version": "2.1.0"},
             "Expected 1 SARIF 2.1.0 run.",
         ),
-        ({"runs": report()["runs"], "version": "2.0.0"}, "Expected 1 SARIF 2.1.0 run."),
+        ({"runs": [run()], "version": "2.0.0"}, "Expected 1 SARIF 2.1.0 run."),
         (report(results=None), "CodeQL report lacks results."),
         (report(invocations=[]), "CodeQL report lacks invocations."),
         (
@@ -152,7 +154,7 @@ def test_finding_of_any_level_fails_and_names_its_place(
         ),
     ],
 )
-def test_incomplete_report_fails(tmp_path: Path, sarif: Any, message: str) -> None:
+def test_incomplete_report_fails(tmp_path: Path, sarif: object, message: str) -> None:
     result = verify(tmp_path, sarif)
     assert result.returncode == 1
     assert result.stderr == f"{message}\n"

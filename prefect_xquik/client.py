@@ -3,11 +3,11 @@
 
 from __future__ import annotations
 
-import json
-from typing import Any, Literal
+from typing import Literal, TypeAlias
 from urllib.parse import quote, urlparse
 
 import httpx
+from pydantic import JsonValue, TypeAdapter, ValidationError
 
 from prefect_xquik._version import __version__
 
@@ -16,6 +16,10 @@ DEFAULT_BASE_URL = "https://xquik.com/api/v1"
 USER_AGENT = f"prefect-xquik/{__version__}"
 
 QueryType = Literal["Latest", "Top"]
+_QUERY_TYPES: dict[str, QueryType] = {"Latest": "Latest", "Top": "Top"}
+JsonObject: TypeAlias = dict[str, JsonValue]
+
+_JSON_VALUE: TypeAdapter[JsonValue] = TypeAdapter(JsonValue)
 
 
 class XquikError(RuntimeError):
@@ -74,10 +78,9 @@ class XquikClient:
         query_type: QueryType = "Latest",
         since_time: str | None = None,
         until_time: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> JsonObject:
         query = _require_text(q, "q")
-        if query_type not in {"Latest", "Top"}:
-            raise ValueError('query_type is invalid. Use "Latest" or "Top".')
+        kind = _require_query_type(query_type)
         if limit is not None and not 1 <= limit <= 200:
             raise ValueError("limit is invalid. Enter a value from 1 to 200.")
 
@@ -87,25 +90,23 @@ class XquikClient:
                 "q": query,
                 "cursor": cursor,
                 "limit": limit,
-                "queryType": query_type,
+                "queryType": kind,
                 "sinceTime": since_time,
                 "untilTime": until_time,
             },
         )
 
-    async def get_tweet(self, tweet_id: str) -> dict[str, Any]:
+    async def get_tweet(self, tweet_id: str) -> JsonObject:
         quoted_id = _quote_path_part(tweet_id, "tweet_id")
         return await self._get_json(f"/x/tweets/{quoted_id}")
 
-    async def search_users(
-        self, q: str, *, cursor: str | None = None
-    ) -> dict[str, Any]:
+    async def search_users(self, q: str, *, cursor: str | None = None) -> JsonObject:
         return await self._get_json(
             "/x/users/search",
             params={"q": _require_text(q, "q"), "cursor": cursor},
         )
 
-    async def get_user(self, user_id: str) -> dict[str, Any]:
+    async def get_user(self, user_id: str) -> JsonObject:
         quoted_id = _quote_path_part(_strip_at_prefix(user_id), "user_id")
         return await self._get_json(f"/x/users/{quoted_id}")
 
@@ -116,7 +117,7 @@ class XquikClient:
         cursor: str | None = None,
         include_parent_tweet: bool = False,
         include_replies: bool = False,
-    ) -> dict[str, Any]:
+    ) -> JsonObject:
         quoted_id = _quote_path_part(_strip_at_prefix(user_id), "user_id")
         return await self._get_json(
             f"/x/users/{quoted_id}/tweets",
@@ -127,7 +128,7 @@ class XquikClient:
             },
         )
 
-    async def get_trends(self, *, count: int = 30, woeid: int = 1) -> dict[str, Any]:
+    async def get_trends(self, *, count: int = 30, woeid: int = 1) -> JsonObject:
         if count < 1 or count > 50:
             raise ValueError("count is invalid. Enter a value from 1 to 50.")
         if woeid < 1:
@@ -139,7 +140,7 @@ class XquikClient:
 
     async def _get_json(
         self, path: str, *, params: dict[str, object | None] | None = None
-    ) -> dict[str, Any]:
+    ) -> JsonObject:
         if self.http_client is not None:
             return await self._send_get(self.http_client, path, params=params)
 
@@ -154,7 +155,7 @@ class XquikClient:
         path: str,
         *,
         params: dict[str, object | None] | None,
-    ) -> dict[str, Any]:
+    ) -> JsonObject:
         try:
             response = await client.get(
                 path,
@@ -173,8 +174,8 @@ class XquikClient:
             raise XquikError(f"Xquik API request failed: {exc}") from exc
 
         try:
-            payload = response.json()
-        except json.JSONDecodeError as exc:
+            payload = _JSON_VALUE.validate_json(response.content)
+        except ValidationError as exc:
             raise XquikError(
                 "Xquik returned invalid JSON. Retry or inspect response_text.",
                 response_text=response.text,
@@ -197,6 +198,13 @@ def _clean_params(params: dict[str, object | None]) -> dict[str, str]:
         for key, value in params.items()
         if value is not None
     }
+
+
+def _require_query_type(value: str) -> QueryType:
+    query_type = _QUERY_TYPES.get(value)
+    if query_type is None:
+        raise ValueError('query_type is invalid. Use "Latest" or "Top".')
+    return query_type
 
 
 def _quote_path_part(value: str, name: str) -> str:

@@ -3,18 +3,22 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
+from pydantic import JsonValue, TypeAdapter
 
 from prefect_xquik import __version__
 from prefect_xquik.client import USER_AGENT
 from prefect_xquik.credentials import XquikCredentials
 
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+
 ROOT = Path(__file__).resolve().parents[1]
+TOML_VALUE: TypeAdapter[JsonValue] = TypeAdapter(JsonValue)
 PREFECT_GUIDE_URL = "https://docs.xquik.com/guides/prefect"
 XQUIK_ICON_URL = "https://xquik.com/icon.svg"
 FULL_AFFILIATION_NOTICE = (
@@ -24,20 +28,26 @@ FULL_AFFILIATION_NOTICE = (
 COMPACT_AFFILIATION_NOTICE = "Not affiliated with X Corp."
 
 
-def test_pyproject_and_package_versions_match() -> None:
-    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
+def pyproject_value(*keys: str) -> JsonValue:
+    document: dict[str, object] = tomllib.loads((ROOT / "pyproject.toml").read_text())
+    value = TOML_VALUE.validate_python(document)
+    for key in keys:
+        assert isinstance(value, dict)
+        value = value[key]
+    return value
 
-    assert pyproject["project"]["version"] == __version__
+
+def test_pyproject_and_package_versions_match() -> None:
+    assert pyproject_value("project", "version") == __version__
 
 
 def test_build_backend_and_package_path_are_fixed() -> None:
-    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
+    wheel = pyproject_value("tool", "hatch", "build", "targets", "wheel")
 
-    assert pyproject["build-system"]["requires"] == ["hatchling==1.32.4"]
-    assert pyproject["build-system"]["build-backend"] == "hatchling.build"
-    assert pyproject["tool"]["hatch"]["build"]["targets"]["wheel"]["packages"] == [
-        "prefect_xquik"
-    ]
+    assert pyproject_value("build-system", "requires") == ["hatchling==1.32.4"]
+    assert pyproject_value("build-system", "build-backend") == "hatchling.build"
+    assert isinstance(wheel, dict)
+    assert wheel["packages"] == ["prefect_xquik"]
 
 
 def test_readme_installs_the_pypi_package() -> None:
@@ -48,11 +58,12 @@ def test_readme_installs_the_pypi_package() -> None:
 
 
 def test_readme_and_package_metadata_have_affiliation_notices() -> None:
-    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
+    description = pyproject_value("project", "description")
     readme = (ROOT / "README.md").read_text()
 
     assert FULL_AFFILIATION_NOTICE in readme
-    assert COMPACT_AFFILIATION_NOTICE in pyproject["project"]["description"]
+    assert isinstance(description, str)
+    assert COMPACT_AFFILIATION_NOTICE in description
 
 
 def test_repository_has_no_github_actions_workflows() -> None:
@@ -71,26 +82,27 @@ def test_user_agent_includes_the_package_version() -> None:
 
 
 def test_public_links_use_the_canonical_prefect_guide() -> None:
-    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
+    urls = pyproject_value("project", "urls")
     readme = (ROOT / "README.md").read_text()
 
-    assert pyproject["project"]["urls"]["Documentation"] == PREFECT_GUIDE_URL
-    assert pyproject["project"]["urls"]["Homepage"] == PREFECT_GUIDE_URL
+    assert isinstance(urls, dict)
+    assert urls["Documentation"] == PREFECT_GUIDE_URL
+    assert urls["Homepage"] == PREFECT_GUIDE_URL
     assert (
-        pyproject["project"]["urls"]["Xquik API Reference"]
-        == "https://docs.xquik.com/api-reference/overview"
+        urls["Xquik API Reference"] == "https://docs.xquik.com/api-reference/overview"
     )
     assert PREFECT_GUIDE_URL in readme
-    assert XquikCredentials._documentation_url == PREFECT_GUIDE_URL
+    assert str(XquikCredentials._documentation_url) == PREFECT_GUIDE_URL
 
 
 def test_credentials_block_uses_the_public_xquik_icon() -> None:
-    assert XquikCredentials._logo_url == XQUIK_ICON_URL
+    assert str(XquikCredentials._logo_url) == XQUIK_ICON_URL
 
 
 def test_package_keywords_cover_approved_search_terms() -> None:
-    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
+    keywords = pyproject_value("project", "keywords")
 
+    assert isinstance(keywords, list)
     assert {
         "data-pipelines",
         "prefect-collection",
@@ -101,4 +113,4 @@ def test_package_keywords_cover_approved_search_terms() -> None:
         "twitter-search",
         "workflow-orchestration",
         "xquik",
-    }.issubset(set(pyproject["project"]["keywords"]))
+    }.issubset(set(keywords))
