@@ -156,6 +156,24 @@ def test_success_status_lists_the_checks_that_passed(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
+    "comment",
+    [
+        "type: ignore[assignment]",
+        "pyright: ignore[reportAssignmentType]",
+        "mypy: ignore-errors",
+        "pyright: basic",
+    ],
+)
+def test_type_checker_comments_fail_the_build(tmp_path: Path, comment: str) -> None:
+    line = f'x: int = "a"  # {comment}'
+    status, events, statuses, output = run_checks(tmp_path, "ready", source=f"{line}\n")
+    assert status == 1
+    assert events == CHECKS[:2]
+    assert statuses == [PENDING, "failure: Failed at Type checker comments."]
+    assert f"probe.py:1:{line}" in output
+
+
+@pytest.mark.parametrize(
     ("case", "ran", "failed"),
     [
         ("reuse", 1, "Licensing with REUSE lint"),
@@ -180,24 +198,6 @@ def test_success_status_lists_the_checks_that_passed(tmp_path: Path) -> None:
         ("changed", 35, "Final tree check"),
     ],
 )
-@pytest.mark.parametrize(
-    "comment",
-    [
-        "type: ignore[assignment]",
-        "pyright: ignore[reportAssignmentType]",
-        "mypy: ignore-errors",
-        "pyright: basic",
-    ],
-)
-def test_type_checker_comments_fail_the_build(tmp_path: Path, comment: str) -> None:
-    line = f'x: int = "a"  # {comment}'
-    status, events, statuses, output = run_checks(tmp_path, "ready", source=f"{line}\n")
-    assert status == 1
-    assert events == CHECKS[:2]
-    assert statuses == [PENDING, "failure: Failed at Type checker comments."]
-    assert f"probe.py:1:{line}" in output
-
-
 def test_failed_check_posts_failure_and_stops(
     tmp_path: Path, case: str, ran: int, failed: str
 ) -> None:
