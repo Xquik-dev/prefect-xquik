@@ -1,6 +1,7 @@
 # Prefect tasks for Twitter search & X API workflows
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13728/badge)](https://www.bestpractices.dev/projects/13728)
+[![Convex Component](https://www.convex.dev/components/badge/convex-xquik)](https://www.convex.dev/components/convex-xquik)
 
 Schedule 6 read-only Twitter search, profile, timeline, and trend tasks in Prefect 3. Store X API keys in Prefect blocks.
 
