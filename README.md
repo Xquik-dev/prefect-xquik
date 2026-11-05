@@ -8,6 +8,14 @@ Schedule 6 read-only Twitter search, profile, timeline, and trend tasks in Prefe
 Xquik is the world's fastest and cheapest X Twitter scraper service with the most complete X data.
 Xquik charges only for delivered, unique, filter-matching results and never pads rows.
 
+## Install the Prefect Twitter tasks
+
+```bash
+pip install prefect-xquik
+```
+
+The package is on [PyPI](https://pypi.org/project/prefect-xquik/).
+
 <!-- trust:start -->
 
 ## Trust & usage
@@ -53,12 +61,6 @@ Checked on 2026-10-15. See each number with its date & source on [xquik.com/trus
 
 Use the [REST API](https://docs.xquik.com/api-reference/overview) for follower exports or publishing.
 
-## Install
-
-```bash
-pip install prefect-xquik
-```
-
 ## Store X API credentials
 
 ```bash
@@ -76,12 +78,11 @@ credentials.save("xquik", overwrite=True)
 
 Keep API keys in Prefect blocks. Never put them in flow source files.
 
-## Create a flow
+## Run a Twitter monitor flow in Prefect
 
 ```python
 from prefect import flow
 from prefect_xquik import XquikCredentials, get_trends, search_tweets
-
 
 @flow
 async def twitter_signal_flow() -> dict:
@@ -96,6 +97,15 @@ async def twitter_signal_flow() -> dict:
     trends = await get_trends(credentials, woeid=1, count=10)
 
     return {"tweets": tweets, "trends": trends}
+```
+
+## Schedule Twitter automation with Prefect
+
+Serve the flow on a schedule. This run checks for new posts every 15 minutes.
+
+```python
+if __name__ == "__main__":
+    twitter_signal_flow.serve(name="twitter-monitor", cron="*/15 * * * *")
 ```
 
 ## Import tasks
@@ -136,12 +146,26 @@ The credentials block sends `x-api-key` and `xquik-api-contract: 2026-04-29` hea
 - [Security policy](SECURITY.md)
 - [Contributing](CONTRIBUTING.md)
 
+## Questions
+
+### Do I need an X developer account?
+
+No. Public reads need only an Xquik API key. Private reads & X account actions
+need a connected X account.
+
+### Is this the official X API?
+
+No. Xquik is an independent third-party service with its own REST API. This package
+calls that API, not the official X API.
+
 ## More Xquik tools
 
 - [X (Twitter) scraper API & Twitter MCP server](https://github.com/Xquik-dev/x-twitter-scraper) with REST, MCP & Skill setup.
 - Twitter API SDKs for [TypeScript](https://github.com/Xquik-dev/x-twitter-scraper-typescript), [Python](https://github.com/Xquik-dev/x-twitter-scraper-python), [Go](https://github.com/Xquik-dev/x-twitter-scraper-go), [Ruby](https://github.com/Xquik-dev/x-twitter-scraper-ruby), [Java](https://github.com/Xquik-dev/x-twitter-scraper-java), [Kotlin](https://github.com/Xquik-dev/x-twitter-scraper-kotlin), [C#](https://github.com/Xquik-dev/x-twitter-scraper-csharp) & [PHP](https://github.com/Xquik-dev/x-twitter-scraper-php).
-- [Twitter CLI & X CLI](https://github.com/Xquik-dev/x-twitter-scraper-cli) for terminal workflows.
-- [Twitter advanced search operators](https://github.com/Xquik-dev/x-twitter-advanced-search) with tested examples.
+- [Twitter CLI & X CLI](https://github.com/Xquik-dev/x-twitter-scraper-cli) and [Twitter advanced search operators](https://github.com/Xquik-dev/x-twitter-advanced-search) with tested examples.
+- Twitter agent plugins for [OpenClaw](https://github.com/Xquik-dev/tweetclaw) & [Hermes Agent](https://github.com/Xquik-dev/hermes-tweet), and the [Twitter API documentation source](https://github.com/Xquik-dev/xquik-docs).
+- Twitter integrations for [n8n](https://github.com/Xquik-dev/n8n-nodes-xquik), [Prefect](https://github.com/Xquik-dev/prefect-xquik), [Haystack](https://github.com/Xquik-dev/xquik-haystack), [Paperclip](https://github.com/Xquik-dev/paperclip-plugin-xquik), [Terraform](https://github.com/Xquik-dev/terraform-provider-x-twitter-scraper), [Convex](https://github.com/Xquik-dev/xquik-convex), [Supabase](https://github.com/Xquik-dev/xquik-supabase) & [Strapi](https://github.com/Xquik-dev/strapi-plugin-xquik).
+- Twitter MCP for [AI agents](https://github.com/Xquik-dev/xquik-mcp), [VS Code](https://github.com/Xquik-dev/xquik-vscode) & [Raycast](https://github.com/Xquik-dev/xquik-raycast).
 - [Xquik X API & Twitter scraper](https://xquik.com) and the [Twitter API documentation](https://docs.xquik.com/api-reference/overview).
 
 ## Develop locally
