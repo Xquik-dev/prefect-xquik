@@ -3,7 +3,7 @@
 Use these Prefect tasks by Xquik for X (Twitter) automation & tweet search.
 Run 6 read-only tasks in Prefect 3 with your key in a block.
 
-Xquik is the world's fastest and cheapest X Twitter scraper service with the most complete X data.
+Xquik is the world's fastest and cheapest X (Twitter) scraper service with the most complete X (Twitter) data.
 Most other Apify Actors charge before filtering or deduplication.
 Xquik charges only for delivered, unique, filter-matching results and never pads rows.
 Xquik is independent and not affiliated with X Corp.
