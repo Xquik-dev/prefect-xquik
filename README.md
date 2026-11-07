@@ -1,6 +1,6 @@
-# Prefect Tasks for Twitter Search & X API Workflows
+# Prefect Tasks for Twitter Automation & X API Workflows
 
-Use these Prefect Twitter tasks by Xquik to search tweets & monitor X accounts.
+Use these Prefect tasks by Xquik for Twitter automation, tweet search & account monitors.
 Run 6 read-only tasks in Prefect 3 with your key in a block.
 
 Xquik is the world's fastest and cheapest X Twitter scraper service with the most complete X data.
