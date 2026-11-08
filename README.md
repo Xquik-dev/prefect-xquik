@@ -47,6 +47,7 @@ Keep API keys in Prefect blocks. Never put them in flow source files.
 from prefect import flow
 from prefect_xquik import XquikCredentials, get_trends, search_tweets
 
+
 @flow
 async def twitter_signal_flow() -> dict:
     credentials = await XquikCredentials.aload("xquik")
