@@ -39,7 +39,7 @@ def test_pyproject_and_package_versions_match() -> None:
 def test_build_backend_and_package_path_are_fixed() -> None:
     wheel = pyproject_value("tool", "hatch", "build", "targets", "wheel")
 
-    assert pyproject_value("build-system", "requires") == ["hatchling==1.32.4"]
+    assert pyproject_value("build-system", "requires") == ["hatchling==1.33.0"]
     assert pyproject_value("build-system", "build-backend") == "hatchling.build"
     assert isinstance(wheel, dict)
     assert wheel["packages"] == ["prefect_xquik"]
