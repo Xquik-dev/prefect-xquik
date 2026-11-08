@@ -7,6 +7,7 @@ version = 1
 path = [
   ".gitignore",
   "*.md",
+  "CITATION.cff",
   "LICENSE",
   "prefect_xquik/py.typed",
   "uv.lock",
