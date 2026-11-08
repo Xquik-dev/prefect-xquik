@@ -1,4 +1,4 @@
-# Prefect Tasks for X (Twitter) Automation & API Workflows
+# Prefect Tasks for X (Twitter) Automation, Search & API Workflows
 
 Use these Prefect tasks by Xquik for X (Twitter) automation & tweet search.
 Run 6 read-only tasks in Prefect 3 with your key in a block.
@@ -83,10 +83,10 @@ Next, read the [Xquik Prefect guide](https://docs.xquik.com/guides/prefect), the
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13728/badge)](https://www.bestpractices.dev/projects/13728)
 
 - 1,100+ downloads of prefect-xquik on PyPI ([source](https://pypistats.org/packages/prefect-xquik)) <!-- trust:pypi-prefect-xquik 1109 -->
-- 6.1 s p99 REST server read time over 7 days, failures included ([source](https://xquik.com/benchmarks#speed)) <!-- trust:rest-p99 6050 -->
+- 5.4 s p99 REST server read time over 7 days, failures included ([source](https://xquik.com/benchmarks#speed)) <!-- trust:rest-p99 5312 -->
 - This repo meets the OpenSSF Best Practices passing criteria ([source](https://www.bestpractices.dev/projects/13728)) <!-- trust:openssf-prefect-xquik 1 -->
 
-Checked on 2026-11-07. See each number with its date & source on [xquik.com/benchmarks](https://xquik.com/benchmarks) or as [JSON](https://xquik.com/trust.json).
+Checked on 2026-11-08. See each number with its date & source on [xquik.com/benchmarks](https://xquik.com/benchmarks) or as [JSON](https://xquik.com/trust.json).
 
 <!-- trust:end -->
 
