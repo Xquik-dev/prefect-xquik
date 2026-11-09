@@ -1,5 +1,9 @@
 # Prefect Tasks for X (Twitter) Automation, Search & API Workflows
 
+[![Framer builds a tweet ticker with Xquik](https://img.youtube.com/vi/4UOSpoOoC3Y/maxresdefault.jpg)](https://youtu.be/4UOSpoOoC3Y?t=367)\
+[Watch Framer build a tweet ticker with Xquik, from 6:07](https://youtu.be/4UOSpoOoC3Y?t=367).
+These Prefect tasks call the Xquik API.
+
 Use these Prefect tasks by Xquik for X (Twitter) automation & tweet search.
 Run 6 read-only tasks in Prefect 3 with your key in a block.
 
